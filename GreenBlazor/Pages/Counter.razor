@@ -1,0 +1,79 @@
+﻿@page "/counter"
+
+<h1>Plotter</h1>
+
+<br />
+
+xMin:
+<input @bind="xMin" type="text" name="name" />
+xMax:
+<input @bind="xMax" type="text" name="name" />
+xStep:
+<input @bind="xStep" type="text" name="name" />
+
+<br />
+<br />
+
+a:
+<input @bind="a" type="text" name="name" />
+b:
+<input @bind="b" type="text" name="name" />
+c:
+<input @bind="c" type="text" name="name" />
+
+<br />
+Point:
+<input @bind="pointString" style="width:25px;" type="text" name="name" />
+
+
+<br />
+<br />
+
+<button @onclick="Plot"> Plot a*x*x + b*x + c </button>
+<button @onclick="Clear" style="margin-left: 10px;"> Clear </button>
+
+<br />
+<br />
+
+<div class="plot-container" style="position: relative; margin-left: 100px; width: 400px; height: 400px; border: 2px solid black;">
+    <div style="position: relative; top:75%; left:50%;"> @((MarkupString)plotHtml) </div>
+</div>
+
+@using System.Threading;
+
+@code {
+    string plotHtml = "";
+
+    double a = 0.1, b = 0, c = 0;
+    double xMin = -50, xMax = 50, xStep = 0.1;
+
+    string pointString = ".";
+
+    private async void Plot()
+    {
+        for (double x = xMin; x <= xMax; x += xStep)
+        {
+            int timeStep = 10;
+            await Task.Delay(timeStep);
+            StateHasChanged();
+            MakePoint(x, a * x * x + b * x + c);
+        }
+    }
+
+    private void MakePoint(double x, double y)
+    {
+        string format = "F";
+        System.Globalization.CultureInfo cultureInfo = System.Globalization.CultureInfo.InvariantCulture;
+        string xString = x.ToString(format, cultureInfo);
+        string minusyString = (-y).ToString(format, cultureInfo);
+
+        plotHtml += $"<span style=\"position:absolute; left: {xString}px; top:{minusyString}px \" >";
+        plotHtml += pointString;
+        plotHtml += "</span>";
+    }
+
+    private void Clear()
+    {
+        plotHtml = "";
+    }
+}
