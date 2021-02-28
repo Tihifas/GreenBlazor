@@ -19,5 +19,15 @@ window.onload = function () {
     var el = document.getElementById('content');
     var greeter = new Greeter(el);
     greeter.start();
+    var alerter = new Alerter();
+    alerter.alert('ALERT');
 };
+var Alerter = /** @class */ (function () {
+    function Alerter() {
+    }
+    Alerter.prototype.alert = function (message) {
+        alert(message);
+    };
+    return Alerter;
+}());
 //# sourceMappingURL=Tiling.js.map
