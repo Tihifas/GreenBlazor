@@ -4,12 +4,27 @@
     let canvasW = window.innerWidth; let canvasH = window.innerHeight;
     canvas.width = canvasW; canvas.height = canvasH;
 
-    let path = new Path2D();
-    path.ellipse(150, 150, 100, 150, 0, 0, Math.PI*2);
-
 
     let ctx = canvas.getContext('2d');
-    ctx.stroke(path);
+
+    ctx.fillStyle = 'blue';
+
+    let diameter = 100;
+    let nRows = 4;
+    let nColumns = 6;
+    let xMin= 100;
+    let xStep = 150;
+    let yMin = 50;
+    let yStep = 150;
+    let nSides = 3;
+    for (var j = 0; j < nRows; j++) {
+        let y = yMin + yStep * j;
+        for (var i = 0; i < nColumns; i++) {
+            let x = xMin + i * xStep;
+            TCanvasLib.FillPolygon(x, y, nSides, diameter, ctx);
+            nSides++;
+        }
+    }
 
     //let image = document.querySelector('img');
     //let sd = new ImageDrawer(ctx, image, 400);

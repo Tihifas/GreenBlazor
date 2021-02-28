@@ -36,10 +36,24 @@ function demo1() {
     var canvasH = window.innerHeight;
     canvas.width = canvasW;
     canvas.height = canvasH;
-    var path = new Path2D();
-    path.ellipse(150, 150, 100, 150, 0, 0, Math.PI * 2);
     var ctx = canvas.getContext('2d');
-    ctx.stroke(path);
+    ctx.fillStyle = 'blue';
+    var diameter = 100;
+    var nRows = 4;
+    var nColumns = 6;
+    var xMin = 100;
+    var xStep = 150;
+    var yMin = 50;
+    var yStep = 150;
+    var nSides = 3;
+    for (var j = 0; j < nRows; j++) {
+        var y = yMin + yStep * j;
+        for (var i = 0; i < nColumns; i++) {
+            var x = xMin + i * xStep;
+            TCanvasLib.FillPolygon(x, y, nSides, diameter, ctx);
+            nSides++;
+        }
+    }
     //let image = document.querySelector('img');
     //let sd = new ImageDrawer(ctx, image, 400);
     //sd.draw(50, 50);
@@ -101,37 +115,65 @@ var ClipDrawer = /** @class */ (function () {
 }());
 function LoadAllFiles(path) {
 }
-//var CanvasHelpers = (function () {
-//    return {
-//        TracePolygon(nSides: number, sideL: number, ctx: CanvasRenderingContext2D) {
-//            //TODO beginpath?
-//            //ctx.
-//            ctx.
-//        }
-//    }
-//}
-//)();
-var PathTurtle = /** @class */ (function () {
-    function PathTurtle(path, x, y, rotation) {
-        if (rotation === void 0) { rotation = 0; }
-        this.path = path;
-        this.pos = new TMath.Vector(x, y);
-        this.rotation = rotation;
+var TCanvasLib;
+(function (TCanvasLib) {
+    function StrokePolygon(x, y, nSides, diameter, ctx) {
+        var path = PolygonPath(x, y, nSides, diameter);
+        ctx.stroke(path);
     }
-    PathTurtle.prototype.pathToPos = function () {
-        this.path.moveTo(this.pos.x, this.pos.y);
-    };
-    PathTurtle.prototype.move = function (length) {
-        var dPos = TMath.Vector.fromRotationAndLength(this.rotation);
-        this.pos.add(dPos);
-        this.pathToPos();
-    };
-    //radians
-    PathTurtle.prototype.rotate = function (angle) {
-        this.rotation += angle;
-    };
-    return PathTurtle;
-}());
+    TCanvasLib.StrokePolygon = StrokePolygon;
+    function FillPolygon(x, y, nSides, diameter, ctx) {
+        var path = PolygonPath(x, y, nSides, diameter);
+        ctx.fill(path);
+    }
+    TCanvasLib.FillPolygon = FillPolygon;
+    function PolygonPath(x, y, nSides, diameter) {
+        var sideL = diameter * Math.sin(Math.PI / nSides);
+        var turtle = new PathTurtle(x, y);
+        var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
+        //TODO: remove
+        var degrees = (innerAngle + 0.0) / (Math.PI * 2) * 360;
+        for (var i = 0; i < nSides; i++) {
+            turtle.move(sideL);
+            turtle.rotate(innerAngle); //- to make it counterclickvise
+        }
+        return turtle.GetPath();
+    }
+    TCanvasLib.PolygonPath = PolygonPath;
+    var PathTurtle = /** @class */ (function () {
+        function PathTurtle(x, y, rotation) {
+            if (rotation === void 0) { rotation = 0; }
+            this.path = new Path2D();
+            this.pos = new TMath.Vector(x, y);
+            this.rotation = rotation;
+            this.path.moveTo(this.pos.x, this.pos.y);
+        }
+        PathTurtle.prototype.GetPath = function () {
+            return this.path;
+        };
+        PathTurtle.prototype.lineToPos = function () {
+            this.path.lineTo(this.pos.x, this.pos.y);
+        };
+        PathTurtle.prototype.move = function (length) {
+            //todo delete
+            //let canvas = document.querySelector('canvas');
+            //let ctx = canvas.getContext('2d');
+            //ctx.moveTo(this.pos.x, this.pos.y);
+            var dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
+            this.pos.add(dPos);
+            //todo delete
+            //ctx.lineTo(this.pos.x, this.pos.y);
+            //ctx.stroke();
+            this.lineToPos();
+        };
+        //radians
+        PathTurtle.prototype.rotate = function (angle) {
+            this.rotation += angle;
+        };
+        return PathTurtle;
+    }());
+    TCanvasLib.PathTurtle = PathTurtle;
+})(TCanvasLib || (TCanvasLib = {}));
 var TMath;
 (function (TMath) {
     var Vector = /** @class */ (function () {
