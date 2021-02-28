@@ -84,10 +84,19 @@
     <Content Include="Pages\demo1.html" />
     <Content Include="Tiling.js" />
     <Content Include="Web.config" />
+    <Content Include="wwwroot\images\IMG_20180423_101732.jpg" />
+    <Content Include="wwwroot\images\IMG_20180423_132559.jpg" />
+    <Content Include="wwwroot\images\IMG_20180424_063153.jpg" />
+    <Content Include="wwwroot\images\IMG_20180424_063643.jpg" />
+    <Content Include="wwwroot\images\IMG_20180424_065134.jpg" />
+    <Content Include="wwwroot\images\IMG_20180424_073829.jpg" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="Alerter.ts" />
+    <TypeScriptCompile Include="Demo1.ts" />
+    <TypeScriptCompile Include="Draw.ts" />
+    <TypeScriptCompile Include="ImageHandler.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
