@@ -115,6 +115,57 @@ var ClipDrawer = /** @class */ (function () {
 }());
 function LoadAllFiles(path) {
 }
+var TMath;
+(function (TMath) {
+    var Vector = /** @class */ (function () {
+        //static N: Vector = new Vector(0, -1);
+        //static NE: Vector = new Vector(Math.sqrt(2), -Math.sqrt(2));
+        //static SE: Vector = new Vector(Math.sqrt(2), Math.sqrt(2));
+        //static S: Vector = new Vector(0, 2);
+        //static SW: Vector = new Vector(-1, 1);
+        //static NW: Vector = new Vector(-1, -1);
+        function Vector(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+        Vector.fromRotationAndLength = function (rotation, lenght) {
+            if (lenght === void 0) { lenght = 1; }
+            var x = Math.cos(rotation) * lenght;
+            var y = Math.sin(rotation) * lenght;
+            return new Vector(x, y);
+        };
+        Vector.prototype.norm = function () {
+            return Math.sqrt(this.x * this.x + this.y * this.y);
+        };
+        Vector.add = function (v1, v2) {
+            return new Vector(v1.x + v2.x, v1.y + v2.y);
+        };
+        Vector.prototype.add = function (vOther) {
+            this.x += vOther.x;
+            this.y += vOther.y;
+        };
+        Vector.subtract = function (v1, v2) {
+            return new Vector(v1.x - v2.x, v1.y - v2.y);
+        };
+        Vector.prototype.substract = function (vOther) {
+            this.x -= vOther.x;
+            this.y -= vOther.y;
+        };
+        Vector.prototype.scale = function (a) {
+            return new Vector(this.x * a, this.y * a);
+        };
+        Vector.prototype.equals = function (vOther) {
+            if (this.x === vOther.x && this.y === vOther.y) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        };
+        return Vector;
+    }());
+    TMath.Vector = Vector;
+})(TMath || (TMath = {}));
 var TCanvasLib;
 (function (TCanvasLib) {
     function StrokePolygon(x, y, nSides, diameter, ctx) {
@@ -174,55 +225,44 @@ var TCanvasLib;
     }());
     TCanvasLib.PathTurtle = PathTurtle;
 })(TCanvasLib || (TCanvasLib = {}));
-var TMath;
-(function (TMath) {
-    var Vector = /** @class */ (function () {
-        //static N: Vector = new Vector(0, -1);
-        //static NE: Vector = new Vector(Math.sqrt(2), -Math.sqrt(2));
-        //static SE: Vector = new Vector(Math.sqrt(2), Math.sqrt(2));
-        //static S: Vector = new Vector(0, 2);
-        //static SW: Vector = new Vector(-1, 1);
-        //static NW: Vector = new Vector(-1, -1);
-        function Vector(x, y) {
-            this.x = x;
-            this.y = y;
-        }
-        Vector.fromRotationAndLength = function (rotation, lenght) {
-            if (lenght === void 0) { lenght = 1; }
-            var x = Math.cos(rotation) * lenght;
-            var y = Math.sin(rotation) * lenght;
-            return new Vector(x, y);
-        };
-        Vector.prototype.norm = function () {
-            return Math.sqrt(this.x * this.x + this.y * this.y);
-        };
-        Vector.add = function (v1, v2) {
-            return new Vector(v1.x + v2.x, v1.y + v2.y);
-        };
-        Vector.prototype.add = function (vOther) {
-            this.x += vOther.x;
-            this.y += vOther.y;
-        };
-        Vector.subtract = function (v1, v2) {
-            return new Vector(v1.x - v2.x, v1.y - v2.y);
-        };
-        Vector.prototype.substract = function (vOther) {
-            this.x -= vOther.x;
-            this.y -= vOther.y;
-        };
-        Vector.prototype.scale = function (a) {
-            return new Vector(this.x * a, this.y * a);
-        };
-        Vector.prototype.equals = function (vOther) {
-            if (this.x === vOther.x && this.y === vOther.y) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        return Vector;
-    }());
-    TMath.Vector = Vector;
-})(TMath || (TMath = {}));
+function cropImageDemo() {
+    // canvas related variables
+    var canvas = document.querySelector('#cropCanvas');
+    var ctx = canvas.getContext('2d');
+    var cw, ch;
+    //var $canvas = $("#canvas");
+    //var canvasOffset = $canvas.offset();
+    //var offsetX = canvasOffset.left;
+    //var offsetY = canvasOffset.top;
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = crop;
+    img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpzX5BQxG90wZnmrvCV-eNGsy-WzS6N1euyQ&usqp=CAU";
+    function crop() {
+        cw = canvas.width = img.width;
+        ch = canvas.height = img.height;
+        var path = TCanvasLib.PolygonPath(60, 3, 6, 200);
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 6;
+        ctx.stroke(path);
+        ctx.clip(path);
+        ctx.drawImage(img, 0, 0);
+    }
+}
+function imageGalleryDemo() {
+    var images = document.querySelectorAll('#imageContainer img');
+    //let xMin: number = 100;
+    //let xStep: number = 100;
+    //for (var i = 0; i < images.length; i++) {
+    //    let x = xMin + i * xStep;
+    //    let y = 100;
+    //    let image = images[i];
+    //    let path = TCanvasLib.PolygonPath(60, 3, 6, 200);
+    //    ctx.strokeStyle = 'black';
+    //    ctx.lineWidth = 6;
+    //    ctx.stroke(path);
+    //    ctx.clip(path);
+    //    ctx.drawImage(img, 0, 0);
+    //}
+}
 //# sourceMappingURL=Tiling.js.map

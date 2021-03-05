@@ -1,4 +1,6 @@
 ﻿namespace TCanvasLib {
+    export function 
+
     export function StrokePolygon(x: number, y: number, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
         let path = PolygonPath(x, y, nSides, diameter);
         ctx.stroke(path);
