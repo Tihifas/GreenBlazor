@@ -1,4 +1,5 @@
-﻿interface IDrawable {
+﻿//TODO: abandoned this, using factories instead
+interface IDrawable {
     draw(x: number, y: number);
 }
 
@@ -38,6 +39,7 @@ class ImageDrawer implements IDrawable {
     }
 }
 
+
 class ClipDrawer implements IDrawable {
     ctx: CanvasRenderingContext2D;
     image: HTMLImageElement;
@@ -52,7 +54,5 @@ class ClipDrawer implements IDrawable {
     draw(x: number, y: number) {
         let height = this.width * (this.image.height + 0.0) / this.image.width;
         this.ctx.drawImage(this.image, x, y, this.width, height);
-
-
     }
 }

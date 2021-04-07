@@ -30,6 +30,88 @@ window.onload = function () {
     //var alerter = new Alerter();
     //alerter.alert('ALERT');
 };
+var TCanvasLib;
+(function (TCanvasLib) {
+    function getDefaultCtx() {
+        var canvas = document.querySelector('canvas');
+        return canvas.getContext('2d');
+    }
+    TCanvasLib.getDefaultCtx = getDefaultCtx;
+    function fixAllCanvasesDpi() {
+        var canvases = document.getElementsByTagName("canvas");
+        for (var i = 0; i < canvases.length; i++) {
+            var canvas = canvases[i];
+            //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
+            var dpi = window.devicePixelRatio;
+            //get CSS height
+            //the + prefix casts it to an integer
+            //the slice method gets rid of "px"
+            var style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
+            //get CSS width
+            var style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
+            //scale the canvas
+            canvas.setAttribute('height', "" + style_height * dpi);
+            canvas.setAttribute('width', "" + style_width * dpi);
+        }
+    }
+    TCanvasLib.fixAllCanvasesDpi = fixAllCanvasesDpi;
+    function strokePolygon(x, y, nSides, diameter, ctx) {
+        var path = polygonPath(x, y, nSides, diameter);
+        ctx.stroke(path);
+    }
+    TCanvasLib.strokePolygon = strokePolygon;
+    function fillPolygon(x, y, nSides, diameter, ctx) {
+        var path = polygonPath(x, y, nSides, diameter);
+        ctx.fill(path);
+    }
+    TCanvasLib.fillPolygon = fillPolygon;
+    function polygonPath(x, y, nSides, diameter) {
+        var sideL = diameter * Math.sin(Math.PI / nSides);
+        var turtle = new PathTurtle(x, y);
+        var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
+        //TODO: remove
+        var degrees = (innerAngle + 0.0) / (Math.PI * 2) * 360;
+        for (var i = 0; i < nSides; i++) {
+            turtle.move(sideL);
+            turtle.rotate(innerAngle); //- to make it counterclickvise
+        }
+        return turtle.getPath();
+    }
+    TCanvasLib.polygonPath = polygonPath;
+    var PathTurtle = /** @class */ (function () {
+        function PathTurtle(x, y, rotation) {
+            if (rotation === void 0) { rotation = 0; }
+            this.path = new Path2D();
+            this.pos = new TMath.Vector(x, y);
+            this.rotation = rotation;
+            this.path.moveTo(this.pos.x, this.pos.y);
+        }
+        PathTurtle.prototype.getPath = function () {
+            return this.path;
+        };
+        PathTurtle.prototype.lineToPos = function () {
+            this.path.lineTo(this.pos.x, this.pos.y);
+        };
+        PathTurtle.prototype.move = function (length) {
+            //todo delete
+            //let canvas = document.querySelector('canvas');
+            //let ctx = canvas.getContext('2d');
+            //ctx.moveTo(this.pos.x, this.pos.y);
+            var dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
+            this.pos.add(dPos);
+            //todo delete
+            //ctx.lineTo(this.pos.x, this.pos.y);
+            //ctx.stroke();
+            this.lineToPos();
+        };
+        //radians
+        PathTurtle.prototype.rotate = function (angle) {
+            this.rotation += angle;
+        };
+        return PathTurtle;
+    }());
+    TCanvasLib.PathTurtle = PathTurtle;
+})(TCanvasLib || (TCanvasLib = {}));
 function demo1() {
     var canvas = document.querySelector('canvas');
     var canvasW = window.innerWidth;
@@ -50,7 +132,7 @@ function demo1() {
         var y = yMin + yStep * j;
         for (var i = 0; i < nColumns; i++) {
             var x = xMin + i * xStep;
-            TCanvasLib.FillPolygon(x, y, nSides, diameter, ctx);
+            TCanvasLib.fillPolygon(x, y, nSides, diameter, ctx);
             nSides++;
         }
     }
@@ -113,6 +195,53 @@ var ClipDrawer = /** @class */ (function () {
     };
     return ClipDrawer;
 }());
+function cropImageDemo() {
+    // canvas related variables
+    var canvas = document.querySelector('#cropCanvas');
+    var ctx = canvas.getContext('2d');
+    var cw, ch;
+    //var $canvas = $("#canvas");
+    //var canvasOffset = $canvas.offset();
+    //var offsetX = canvasOffset.left;
+    //var offsetY = canvasOffset.top;
+    var img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = crop;
+    img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpzX5BQxG90wZnmrvCV-eNGsy-WzS6N1euyQ&usqp=CAU";
+    function crop() {
+        cw = canvas.width = img.width;
+        ch = canvas.height = img.height;
+        var path = TCanvasLib.polygonPath(60, 3, 6, 200);
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 6;
+        ctx.stroke(path);
+        ctx.clip(path);
+        ctx.drawImage(img, 0, 0);
+    }
+}
+function imageGalleryDemo() {
+    alert('not complete, so outcommented');
+    //    var canvas: HTMLCanvasElement = document.querySelector('#cropCanvas');
+    //    var ctx = canvas.getContext('2d');
+    //    let images = document.querySelectorAll('#imageContainer img');
+    //    let xMin: number = 100;
+    //    let xStep: number = 100;
+    //    for (var i = 0; i < images.length; i++) {
+    //        let x = xMin + i * xStep;
+    //        let y = 100;
+    //        let image = images[i];
+    //        let path = TCanvasLib.polygonPath(60, 3, 6, 200);
+    //        ctx.strokeStyle = 'black';
+    //        ctx.lineWidth = 6;
+    //        ctx.stroke(path);
+    //        ctx.clip(path);
+    //        var img = new Image();
+    //        img.crossOrigin = 'anonymous';
+    //        img.onload = crop;
+    //        img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpzX5BQxG90wZnmrvCV-eNGsy-WzS6N1euyQ&usqp=CAU";
+    //        ctx.drawImage(img, 0, 0);
+    //    }
+}
 function LoadAllFiles(path) {
 }
 var TMath;
@@ -166,103 +295,52 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TCanvasLib;
-(function (TCanvasLib) {
-    function StrokePolygon(x, y, nSides, diameter, ctx) {
-        var path = PolygonPath(x, y, nSides, diameter);
-        ctx.stroke(path);
-    }
-    TCanvasLib.StrokePolygon = StrokePolygon;
-    function FillPolygon(x, y, nSides, diameter, ctx) {
-        var path = PolygonPath(x, y, nSides, diameter);
-        ctx.fill(path);
-    }
-    TCanvasLib.FillPolygon = FillPolygon;
-    function PolygonPath(x, y, nSides, diameter) {
-        var sideL = diameter * Math.sin(Math.PI / nSides);
-        var turtle = new PathTurtle(x, y);
-        var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
-        //TODO: remove
-        var degrees = (innerAngle + 0.0) / (Math.PI * 2) * 360;
-        for (var i = 0; i < nSides; i++) {
-            turtle.move(sideL);
-            turtle.rotate(innerAngle); //- to make it counterclickvise
+var TFactories;
+(function (TFactories) {
+    var Circle = /** @class */ (function () {
+        function Circle(ctx, pos, radius, color) {
+            if (radius === void 0) { radius = 5; }
+            if (color === void 0) { color = 'black'; }
+            this.pos = pos;
+            //for better performance use cavasdata? https://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
+            //ctx.fillRect(pos.x, pos.y, 1, 1);
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI, false);
+            ctx.fillStyle = color;
+            ctx.fill();
         }
-        return turtle.GetPath();
-    }
-    TCanvasLib.PolygonPath = PolygonPath;
-    var PathTurtle = /** @class */ (function () {
-        function PathTurtle(x, y, rotation) {
-            if (rotation === void 0) { rotation = 0; }
-            this.path = new Path2D();
-            this.pos = new TMath.Vector(x, y);
-            this.rotation = rotation;
-            this.path.moveTo(this.pos.x, this.pos.y);
-        }
-        PathTurtle.prototype.GetPath = function () {
-            return this.path;
-        };
-        PathTurtle.prototype.lineToPos = function () {
-            this.path.lineTo(this.pos.x, this.pos.y);
-        };
-        PathTurtle.prototype.move = function (length) {
-            //todo delete
-            //let canvas = document.querySelector('canvas');
-            //let ctx = canvas.getContext('2d');
-            //ctx.moveTo(this.pos.x, this.pos.y);
-            var dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
-            this.pos.add(dPos);
-            //todo delete
-            //ctx.lineTo(this.pos.x, this.pos.y);
-            //ctx.stroke();
-            this.lineToPos();
-        };
-        //radians
-        PathTurtle.prototype.rotate = function (angle) {
-            this.rotation += angle;
-        };
-        return PathTurtle;
+        return Circle;
     }());
-    TCanvasLib.PathTurtle = PathTurtle;
-})(TCanvasLib || (TCanvasLib = {}));
-function cropImageDemo() {
-    // canvas related variables
-    var canvas = document.querySelector('#cropCanvas');
-    var ctx = canvas.getContext('2d');
-    var cw, ch;
-    //var $canvas = $("#canvas");
-    //var canvasOffset = $canvas.offset();
-    //var offsetX = canvasOffset.left;
-    //var offsetY = canvasOffset.top;
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = crop;
-    img.src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRpzX5BQxG90wZnmrvCV-eNGsy-WzS6N1euyQ&usqp=CAU";
-    function crop() {
-        cw = canvas.width = img.width;
-        ch = canvas.height = img.height;
-        var path = TCanvasLib.PolygonPath(60, 3, 6, 200);
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 6;
-        ctx.stroke(path);
-        ctx.clip(path);
-        ctx.drawImage(img, 0, 0);
+    TFactories.Circle = Circle;
+    var CircleFactory = /** @class */ (function () {
+        function CircleFactory(ctx, r, color) {
+            if (r === void 0) { r = 5; }
+            if (color === void 0) { color = 'black'; }
+            this.ctx = ctx;
+            this.r = r;
+        }
+        CircleFactory.prototype.create = function (pos) {
+            var point = new Circle(this.ctx, pos, this.r, this.color);
+            return point;
+        };
+        return CircleFactory;
+    }());
+    TFactories.CircleFactory = CircleFactory;
+})(TFactories || (TFactories = {}));
+function circleFactoryDemo() {
+    var ctx = TCanvasLib.getDefaultCtx();
+    ctx.translate(25, 25);
+    var factory = new TFactories.CircleFactory(ctx);
+    //naming convention as Solid State physics s. 10
+    var a1 = new TMath.Vector(100, 0);
+    var a2 = new TMath.Vector(50, 200);
+    var mMin = 0, mMax = 8;
+    var nMin = 0, nMax = 8;
+    for (var m = mMin; m < mMax; m++) {
+        for (var n = nMin; n < nMax; n++) {
+            var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
+            factory.create(pos);
+        }
     }
-}
-function imageGalleryDemo() {
-    var images = document.querySelectorAll('#imageContainer img');
-    //let xMin: number = 100;
-    //let xStep: number = 100;
-    //for (var i = 0; i < images.length; i++) {
-    //    let x = xMin + i * xStep;
-    //    let y = 100;
-    //    let image = images[i];
-    //    let path = TCanvasLib.PolygonPath(60, 3, 6, 200);
-    //    ctx.strokeStyle = 'black';
-    //    ctx.lineWidth = 6;
-    //    ctx.stroke(path);
-    //    ctx.clip(path);
-    //    ctx.drawImage(img, 0, 0);
-    //}
 }
 //# sourceMappingURL=Tiling.js.map

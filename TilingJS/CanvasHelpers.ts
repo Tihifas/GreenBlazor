@@ -1,17 +1,38 @@
 ﻿namespace TCanvasLib {
-    export function 
+    export function getDefaultCtx() {
+        var canvas: HTMLCanvasElement = document.querySelector('canvas');
+        return canvas.getContext('2d');
+    }
 
-    export function StrokePolygon(x: number, y: number, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
-        let path = PolygonPath(x, y, nSides, diameter);
+    export function fixAllCanvasesDpi() {
+        let canvases = document.getElementsByTagName("canvas");
+        for (var i = 0; i < canvases.length; i++) {
+            let canvas = canvases[i];
+            //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
+            let dpi = window.devicePixelRatio;
+            //get CSS height
+            //the + prefix casts it to an integer
+            //the slice method gets rid of "px"
+            let style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
+            //get CSS width
+            let style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
+            //scale the canvas
+            canvas.setAttribute('height', "" + style_height * dpi);
+            canvas.setAttribute('width', "" + style_width * dpi);
+        }
+    }
+
+    export function strokePolygon(x: number, y: number, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
+        let path = polygonPath(x, y, nSides, diameter);
         ctx.stroke(path);
     }
 
-    export function FillPolygon(x: number, y: number, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
-        let path = PolygonPath(x, y, nSides, diameter);
+    export function fillPolygon(x: number, y: number, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
+        let path = polygonPath(x, y, nSides, diameter);
         ctx.fill(path);
     }
 
-    export function PolygonPath(x: number, y: number, nSides: number, diameter: number) {
+    export function polygonPath(x: number, y: number, nSides: number, diameter: number) {
         let sideL = diameter * Math.sin(Math.PI / nSides);
         let turtle = new PathTurtle(x, y);
         let innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
@@ -22,7 +43,7 @@
             turtle.move(sideL);
             turtle.rotate(innerAngle); //- to make it counterclickvise
         }
-        return turtle.GetPath();
+        return turtle.getPath();
     }
 
     export class PathTurtle {
@@ -38,7 +59,7 @@
             this.path.moveTo(this.pos.x, this.pos.y);
         }
 
-        public GetPath() {
+        public getPath() {
             return this.path;
         }
 

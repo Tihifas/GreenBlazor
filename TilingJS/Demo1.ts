@@ -21,7 +21,7 @@
         let y = yMin + yStep * j;
         for (var i = 0; i < nColumns; i++) {
             let x = xMin + i * xStep;
-            TCanvasLib.FillPolygon(x, y, nSides, diameter, ctx);
+            TCanvasLib.fillPolygon(x, y, nSides, diameter, ctx);
             nSides++;
         }
     }
