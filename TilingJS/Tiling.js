@@ -195,6 +195,88 @@ var ClipDrawer = /** @class */ (function () {
     };
     return ClipDrawer;
 }());
+var TFactories;
+(function (TFactories) {
+    //MAKE FACTORIES USING BUILDER PATTERN?
+    var CircleFactory = /** @class */ (function () {
+        function CircleFactory(ctx, r, color) {
+            if (r === void 0) { r = 5; }
+            if (color === void 0) { color = 'black'; }
+            this.ctx = ctx;
+            this.r = r;
+        }
+        CircleFactory.prototype.create = function (pos) {
+            var point = new TPosObjects.Circle(this.ctx, pos, this.r, this.color);
+            return point;
+        };
+        return CircleFactory;
+    }());
+    TFactories.CircleFactory = CircleFactory;
+    var DelegatePosObjectFactory = /** @class */ (function () {
+        function DelegatePosObjectFactory(ctx, posObjectFactoryDelegate) {
+            this.ctx = ctx,
+                this.posObjectFactoryDelegate = posObjectFactoryDelegate;
+        }
+        DelegatePosObjectFactory.prototype.create = function (pos) {
+            return this.posObjectFactoryDelegate(this.ctx, pos);
+        };
+        return DelegatePosObjectFactory;
+    }());
+    TFactories.DelegatePosObjectFactory = DelegatePosObjectFactory;
+})(TFactories || (TFactories = {}));
+var TDemos;
+(function (TDemos) {
+    function circleFactoryDemo() {
+        var ctx = TCanvasLib.getDefaultCtx();
+        ctx.translate(25, 25);
+        var factory = new TFactories.CircleFactory(ctx);
+        //naming convention as Solid State physics s. 10
+        var a1 = new TMath.Vector(100, 0);
+        var a2 = new TMath.Vector(50, 200);
+        var mMin = 0, mMax = 8;
+        var nMin = 0, nMax = 8;
+        for (var m = mMin; m < mMax; m++) {
+            for (var n = nMin; n < nMax; n++) {
+                var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
+                factory.create(pos);
+            }
+        }
+    }
+    TDemos.circleFactoryDemo = circleFactoryDemo;
+    function posObjectFactoryDemo() {
+        var ctx = TCanvasLib.getDefaultCtx();
+        var canvas = ctx.canvas;
+        var canvasWidth = canvas.width;
+        var canvasHeight = canvas.height;
+        ctx.translate(canvasWidth / 2, canvasHeight / 2);
+        //naming convention as Solid State physics s. 10
+        var a1 = new TMath.Vector(30, 0);
+        var a2 = new TMath.Vector(15, 25);
+        var mMin = -canvasWidth / a1.norm(), mMax = canvasWidth / a1.norm();
+        var nMin = -canvasHeight / a2.norm(), nMax = canvasHeight / a2.norm();
+        var factory = new TFactories.DelegatePosObjectFactory(ctx, function (ctx, pos) {
+            var center = new TMath.Vector(0, 0);
+            var dist = TMath.Vector.subtract(pos, center).norm();
+            var distRelativeTo = canvasHeight;
+            var capedPercentDist = Math.round(Math.min(1, dist / distRelativeTo) * 100);
+            //let colorNumber = capedRelativeDist * 255;
+            //let color: string = ('00' + (colorNumber).to(16)).slice(2);
+            var colorPercent = capedPercentDist.toString() + '%';
+            var color = "rgb(" + colorPercent + "," + colorPercent + "," + colorPercent + ")";
+            var r = Math.round(a1.norm() / 2);
+            return new TPosObjects.Circle(ctx, pos, r, color);
+        });
+        //let mMin = -20, mMax = 20;
+        //let nMin = -20, nMax = 20;
+        for (var m = mMin; m < mMax; m++) {
+            for (var n = nMin; n < nMax; n++) {
+                var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
+                factory.create(pos);
+            }
+        }
+    }
+    TDemos.posObjectFactoryDemo = posObjectFactoryDemo;
+})(TDemos || (TDemos = {}));
 function cropImageDemo() {
     // canvas related variables
     var canvas = document.querySelector('#cropCanvas');
@@ -295,8 +377,8 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TFactories;
-(function (TFactories) {
+var TPosObjects;
+(function (TPosObjects) {
     var Circle = /** @class */ (function () {
         function Circle(ctx, pos, radius, color) {
             if (radius === void 0) { radius = 5; }
@@ -311,36 +393,6 @@ var TFactories;
         }
         return Circle;
     }());
-    TFactories.Circle = Circle;
-    var CircleFactory = /** @class */ (function () {
-        function CircleFactory(ctx, r, color) {
-            if (r === void 0) { r = 5; }
-            if (color === void 0) { color = 'black'; }
-            this.ctx = ctx;
-            this.r = r;
-        }
-        CircleFactory.prototype.create = function (pos) {
-            var point = new Circle(this.ctx, pos, this.r, this.color);
-            return point;
-        };
-        return CircleFactory;
-    }());
-    TFactories.CircleFactory = CircleFactory;
-})(TFactories || (TFactories = {}));
-function circleFactoryDemo() {
-    var ctx = TCanvasLib.getDefaultCtx();
-    ctx.translate(25, 25);
-    var factory = new TFactories.CircleFactory(ctx);
-    //naming convention as Solid State physics s. 10
-    var a1 = new TMath.Vector(100, 0);
-    var a2 = new TMath.Vector(50, 200);
-    var mMin = 0, mMax = 8;
-    var nMin = 0, nMax = 8;
-    for (var m = mMin; m < mMax; m++) {
-        for (var n = nMin; n < nMax; n++) {
-            var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
-            factory.create(pos);
-        }
-    }
-}
+    TPosObjects.Circle = Circle;
+})(TPosObjects || (TPosObjects = {}));
 //# sourceMappingURL=Tiling.js.map
