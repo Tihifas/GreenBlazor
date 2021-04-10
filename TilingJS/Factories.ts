@@ -92,6 +92,12 @@
                 = (ctx, pos, diameter, color) => new TPosObjects.Circle(ctx, pos, diameter / 2, color);
             factory.diameterDelegate = (pos) => TMath.logisticFunction(TMath.Vector.subtract(pos, center).norm(), diameterMax, x0, growthFactor);
             factory.colorDelegate = (pos) => color;
+
+            //UNDO
+            //var gradient = tinygradient();
+            //tinycolor.
+            //Tinygradient.
+
             return factory;
         }
     }

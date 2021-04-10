@@ -17,4 +17,13 @@
             ctx.fill();
         }
     }
+
+    export class Polygon implements IPosObject {
+        pos: TMath.Vector;
+
+        constructor(ctx: CanvasRenderingContext2D, pos: TMath.Vector, diameter: number = 5, color: string = 'black') {
+            this.pos = pos;
+            TCanvasLib.fillPolygon(pos, 6, diameter, ctx);
+        }
+    }
 }

@@ -55,22 +55,20 @@ var TCanvasLib;
         }
     }
     TCanvasLib.fixAllCanvasesDpi = fixAllCanvasesDpi;
-    function strokePolygon(x, y, nSides, diameter, ctx) {
-        var path = polygonPath(x, y, nSides, diameter);
+    function strokePolygon(vec, nSides, diameter, ctx) {
+        var path = polygonPath(vec, nSides, diameter);
         ctx.stroke(path);
     }
     TCanvasLib.strokePolygon = strokePolygon;
-    function fillPolygon(x, y, nSides, diameter, ctx) {
-        var path = polygonPath(x, y, nSides, diameter);
+    function fillPolygon(pos0, nSides, diameter, ctx) {
+        var path = polygonPath(pos0, nSides, diameter);
         ctx.fill(path);
     }
     TCanvasLib.fillPolygon = fillPolygon;
-    function polygonPath(x, y, nSides, diameter) {
+    function polygonPath(vec, nSides, diameter) {
         var sideL = diameter * Math.sin(Math.PI / nSides);
-        var turtle = new PathTurtle(x, y);
+        var turtle = new PathTurtle(vec);
         var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
-        //TODO: remove
-        var degrees = (innerAngle + 0.0) / (Math.PI * 2) * 360;
         for (var i = 0; i < nSides; i++) {
             turtle.move(sideL);
             turtle.rotate(innerAngle); //- to make it counterclickvise
@@ -79,10 +77,10 @@ var TCanvasLib;
     }
     TCanvasLib.polygonPath = polygonPath;
     var PathTurtle = /** @class */ (function () {
-        function PathTurtle(x, y, rotation) {
+        function PathTurtle(pos0, rotation) {
             if (rotation === void 0) { rotation = 0; }
             this.path = new Path2D();
-            this.pos = new TMath.Vector(x, y);
+            this.pos = pos0;
             this.rotation = rotation;
             this.path.moveTo(this.pos.x, this.pos.y);
         }
@@ -132,7 +130,8 @@ function demo1() {
         var y = yMin + yStep * j;
         for (var i = 0; i < nColumns; i++) {
             var x = xMin + i * xStep;
-            TCanvasLib.fillPolygon(x, y, nSides, diameter, ctx);
+            var pos = new TMath.Vector(x, y);
+            TCanvasLib.fillPolygon(pos, nSides, diameter, ctx);
             nSides++;
         }
     }
@@ -245,6 +244,10 @@ var TFactories;
                 = function (ctx, pos, diameter, color) { return new TPosObjects.Circle(ctx, pos, diameter / 2, color); };
             factory.diameterDelegate = function (pos) { return TMath.logisticFunction(TMath.Vector.subtract(pos, center).norm(), diameterMax, x0, growthFactor); };
             factory.colorDelegate = function (pos) { return color; };
+            //UNDO
+            //var gradient = tinygradient();
+            //tinycolor.
+            //Tinygradient.
             return factory;
         };
         return PosDiameterColorObjectFactory;
@@ -400,6 +403,16 @@ var TPosObjects;
         return Circle;
     }());
     TPosObjects.Circle = Circle;
+    var Polygon = /** @class */ (function () {
+        function Polygon(ctx, pos, diameter, color) {
+            if (diameter === void 0) { diameter = 5; }
+            if (color === void 0) { color = 'black'; }
+            this.pos = pos;
+            TCanvasLib.fillPolygon(pos, 6, diameter, ctx);
+        }
+        return Polygon;
+    }());
+    TPosObjects.Polygon = Polygon;
 })(TPosObjects || (TPosObjects = {}));
 var TMath;
 (function (TMath) {

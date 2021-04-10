@@ -22,22 +22,20 @@
         }
     }
 
-    export function strokePolygon(x: number, y: number, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
-        let path = polygonPath(x, y, nSides, diameter);
+    export function strokePolygon(vec: TMath.Vector, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
+        let path = polygonPath(vec, nSides, diameter);
         ctx.stroke(path);
     }
 
-    export function fillPolygon(x: number, y: number, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
-        let path = polygonPath(x, y, nSides, diameter);
+    export function fillPolygon(pos0: TMath.Vector, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
+        let path = polygonPath(pos0, nSides, diameter);
         ctx.fill(path);
     }
 
-    export function polygonPath(x: number, y: number, nSides: number, diameter: number) {
+    export function polygonPath(vec: TMath.Vector, nSides: number, diameter: number) {
         let sideL = diameter * Math.sin(Math.PI / nSides);
-        let turtle = new PathTurtle(x, y);
+        let turtle = new PathTurtle(vec);
         let innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
-        //TODO: remove
-        let degrees = (innerAngle + 0.0) / (Math.PI * 2) * 360;
 
         for (var i = 0; i < nSides; i++) {
             turtle.move(sideL);
@@ -51,9 +49,9 @@
         private rotation: number; //radians
         private path: Path2D;
 
-        constructor(x: number, y: number, rotation = 0) {
+        constructor(pos0: TMath.Vector, rotation = 0) {
             this.path = new Path2D();
-            this.pos = new TMath.Vector(x, y);
+            this.pos = pos0;
             this.rotation = rotation;
 
             this.path.moveTo(this.pos.x, this.pos.y);
