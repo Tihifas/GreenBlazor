@@ -22,32 +22,40 @@
         let ctx = TCanvasLib.getDefaultCtx();
         let canvas = ctx.canvas;
         let canvasWidth = canvas.width;
-        let canvasHeight= canvas.height;
+        let canvasHeight = canvas.height;
         ctx.translate(canvasWidth / 2, canvasHeight / 2);
 
         //naming convention as Solid State physics s. 10
-        let a1 = new TMath.Vector(30, 0);
-        let a2 = new TMath.Vector(15, 25);
+        let diameter = 1;
+        let a1 = new TMath.Vector(diameter, 0);
+        let a2 = new TMath.Vector(diameter / 2, diameter * 0.8);
         let mMin = -canvasWidth / a1.norm(), mMax = canvasWidth / a1.norm();
         let nMin = -canvasHeight / a2.norm(), nMax = canvasHeight / a2.norm();
 
         let factory = new TFactories.DelegatePosObjectFactory(ctx, (ctx, pos) => {
-            let center = new TMath.Vector(0,0);
+            let center = new TMath.Vector(0, 0);
             let dist = TMath.Vector.subtract(pos, center).norm();
             let distRelativeTo = canvasHeight;
             let capedPercentDist = Math.round(Math.min(1, dist / distRelativeTo) * 100);
             //let colorNumber = capedRelativeDist * 255;
 
             //let color: string = ('00' + (colorNumber).to(16)).slice(2);
+            let colorPercent: string;
+            if (Math.round(capedPercentDist / 4) % 2 == 0) {
+                colorPercent = '0%';
+            }
+            else {
+                colorPercent = '100%';
+            }
 
-            let colorPercent: string = capedPercentDist.toString() + '%';
+            //let colorPercent: string = capedPercentDist.toString() + '%';
+
 
             let color: string = "rgb(" + colorPercent + "," + colorPercent + "," + colorPercent + ")";
-            let r = Math.round(a1.norm()/2);
-            return new TPosObjects.Circle(ctx, pos, r, color);
+            return new TPosObjects.Circle(ctx, pos, diameter / 2, color);
         });
 
-        
+
         //let mMin = -20, mMax = 20;
         //let nMin = -20, nMax = 20;
         for (var m = mMin; m < mMax; m++) {

@@ -250,8 +250,9 @@ var TDemos;
         var canvasHeight = canvas.height;
         ctx.translate(canvasWidth / 2, canvasHeight / 2);
         //naming convention as Solid State physics s. 10
-        var a1 = new TMath.Vector(30, 0);
-        var a2 = new TMath.Vector(15, 25);
+        var diameter = 1;
+        var a1 = new TMath.Vector(diameter, 0);
+        var a2 = new TMath.Vector(diameter / 2, diameter * 0.8);
         var mMin = -canvasWidth / a1.norm(), mMax = canvasWidth / a1.norm();
         var nMin = -canvasHeight / a2.norm(), nMax = canvasHeight / a2.norm();
         var factory = new TFactories.DelegatePosObjectFactory(ctx, function (ctx, pos) {
@@ -261,10 +262,16 @@ var TDemos;
             var capedPercentDist = Math.round(Math.min(1, dist / distRelativeTo) * 100);
             //let colorNumber = capedRelativeDist * 255;
             //let color: string = ('00' + (colorNumber).to(16)).slice(2);
-            var colorPercent = capedPercentDist.toString() + '%';
+            var colorPercent;
+            if (Math.round(capedPercentDist / 4) % 2 == 0) {
+                colorPercent = '0%';
+            }
+            else {
+                colorPercent = '100%';
+            }
+            //let colorPercent: string = capedPercentDist.toString() + '%';
             var color = "rgb(" + colorPercent + "," + colorPercent + "," + colorPercent + ")";
-            var r = Math.round(a1.norm() / 2);
-            return new TPosObjects.Circle(ctx, pos, r, color);
+            return new TPosObjects.Circle(ctx, pos, diameter / 2, color);
         });
         //let mMin = -20, mMax = 20;
         //let nMin = -20, nMax = 20;
