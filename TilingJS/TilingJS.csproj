@@ -105,6 +105,7 @@
     <TypeScriptCompile Include="ImageHandler.ts" />
     <TypeScriptCompile Include="PosObjects.ts" />
     <TypeScriptCompile Include="TMath.ts" />
+    <TypeScriptCompile Include="Vector.ts" />
     <TypeScriptCompile Include="CanvasHelpers.ts" />
   </ItemGroup>
   <ItemGroup>

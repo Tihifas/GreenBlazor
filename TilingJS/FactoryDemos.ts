@@ -65,4 +65,30 @@
             }
         }
     }
+
+    export function PosDiameterColorObjectFactoryDemo() {
+        let ctx = TCanvasLib.getDefaultCtx();
+        let canvas = ctx.canvas;
+        let canvasWidth = canvas.width;
+        let canvasHeight = canvas.height;
+        ctx.translate(canvasWidth / 2, canvasHeight / 2);
+
+        //naming convention as Solid State physics s. 10
+        let diameterMax = 20;
+        let spacing = diameterMax;
+        let a1 = new TMath.Vector(spacing, 0);
+        let a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing*spacing - (spacing/2)*(spacing/2)));
+        let mMin = -canvasWidth / a1.norm(), mMax = canvasWidth / a1.norm();
+        let nMin = -canvasHeight / a2.norm(), nMax = canvasHeight / a2.norm();
+
+        let center = new TMath.Vector(0,0);
+        let factory = TFactories.PosDiameterColorObjectFactory.logisticDiameterFactory(ctx, center, 20);
+
+        for (var m = mMin; m < mMax; m++) {
+            for (var n = nMin; n < nMax; n++) {
+                let pos: TMath.Vector = TMath.Vector.add(a1.scale(m), a2.scale(n));
+                factory.create(pos);
+            }
+        }
+    }
 }

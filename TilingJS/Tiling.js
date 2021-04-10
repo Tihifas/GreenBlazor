@@ -223,6 +223,33 @@ var TFactories;
         return DelegatePosObjectFactory;
     }());
     TFactories.DelegatePosObjectFactory = DelegatePosObjectFactory;
+    var PosDiameterColorObjectFactory = /** @class */ (function () {
+        function PosDiameterColorObjectFactory(ctx) {
+            this.posObjectFactoryDelegate = function (ctx, pos, diameter, color) { return new TPosObjects.Circle(ctx, pos, diameter / 2, color); }; //recomended to be overwritten
+            this.diameterDelegate = function (pos) { return 5; };
+            this.colorDelegate = function (pos) { return 'black'; };
+            this.ctx = ctx;
+        }
+        PosDiameterColorObjectFactory.prototype.create = function (pos) {
+            var diameter = this.diameterDelegate(pos);
+            var color = this.colorDelegate(pos);
+            return this.posObjectFactoryDelegate(this.ctx, pos, diameter, color);
+        };
+        PosDiameterColorObjectFactory.logisticDiameterFactory = function (ctx, center, diameterMax, x0, growthFactor, color) {
+            if (diameterMax === void 0) { diameterMax = 20; }
+            if (x0 === void 0) { x0 = 200; }
+            if (growthFactor === void 0) { growthFactor = 0.01; }
+            if (color === void 0) { color = "blue"; }
+            var factory = new TFactories.PosDiameterColorObjectFactory(ctx);
+            factory.posObjectFactoryDelegate
+                = function (ctx, pos, diameter, color) { return new TPosObjects.Circle(ctx, pos, diameter / 2, color); };
+            factory.diameterDelegate = function (pos) { return TMath.logisticFunction(TMath.Vector.subtract(pos, center).norm(), diameterMax, x0, growthFactor); };
+            factory.colorDelegate = function (pos) { return color; };
+            return factory;
+        };
+        return PosDiameterColorObjectFactory;
+    }());
+    TFactories.PosDiameterColorObjectFactory = PosDiameterColorObjectFactory;
 })(TFactories || (TFactories = {}));
 var TDemos;
 (function (TDemos) {
@@ -283,6 +310,29 @@ var TDemos;
         }
     }
     TDemos.posObjectFactoryDemo = posObjectFactoryDemo;
+    function PosDiameterColorObjectFactoryDemo() {
+        var ctx = TCanvasLib.getDefaultCtx();
+        var canvas = ctx.canvas;
+        var canvasWidth = canvas.width;
+        var canvasHeight = canvas.height;
+        ctx.translate(canvasWidth / 2, canvasHeight / 2);
+        //naming convention as Solid State physics s. 10
+        var diameterMax = 20;
+        var spacing = diameterMax;
+        var a1 = new TMath.Vector(spacing, 0);
+        var a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing * spacing - (spacing / 2) * (spacing / 2)));
+        var mMin = -canvasWidth / a1.norm(), mMax = canvasWidth / a1.norm();
+        var nMin = -canvasHeight / a2.norm(), nMax = canvasHeight / a2.norm();
+        var center = new TMath.Vector(0, 0);
+        var factory = TFactories.PosDiameterColorObjectFactory.logisticDiameterFactory(ctx, center, 20);
+        for (var m = mMin; m < mMax; m++) {
+            for (var n = nMin; n < nMax; n++) {
+                var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
+                factory.create(pos);
+            }
+        }
+    }
+    TDemos.PosDiameterColorObjectFactoryDemo = PosDiameterColorObjectFactoryDemo;
 })(TDemos || (TDemos = {}));
 function cropImageDemo() {
     // canvas related variables
@@ -333,6 +383,35 @@ function imageGalleryDemo() {
 }
 function LoadAllFiles(path) {
 }
+var TPosObjects;
+(function (TPosObjects) {
+    var Circle = /** @class */ (function () {
+        function Circle(ctx, pos, radius, color) {
+            if (radius === void 0) { radius = 5; }
+            if (color === void 0) { color = 'black'; }
+            this.pos = pos;
+            //for better performance use cavasdata? https://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
+            //ctx.fillRect(pos.x, pos.y, 1, 1);
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI, false);
+            ctx.fillStyle = color;
+            ctx.fill();
+        }
+        return Circle;
+    }());
+    TPosObjects.Circle = Circle;
+})(TPosObjects || (TPosObjects = {}));
+var TMath;
+(function (TMath) {
+    function logisticFunction(x, maxValue, x0, growthRate) {
+        if (maxValue === void 0) { maxValue = 1; }
+        if (x0 === void 0) { x0 = 6; }
+        if (growthRate === void 0) { growthRate = 1; }
+        var result = maxValue / (1 + Math.exp(-growthRate * (x - x0)));
+        return result;
+    }
+    TMath.logisticFunction = logisticFunction;
+})(TMath || (TMath = {}));
 var TMath;
 (function (TMath) {
     var Vector = /** @class */ (function () {
@@ -354,6 +433,9 @@ var TMath;
         };
         Vector.prototype.norm = function () {
             return Math.sqrt(this.x * this.x + this.y * this.y);
+        };
+        Vector.prototype.polarAngle = function () {
+            return Math.atan2(this.y, this.x);
         };
         Vector.add = function (v1, v2) {
             return new Vector(v1.x + v2.x, v1.y + v2.y);
@@ -384,22 +466,4 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TPosObjects;
-(function (TPosObjects) {
-    var Circle = /** @class */ (function () {
-        function Circle(ctx, pos, radius, color) {
-            if (radius === void 0) { radius = 5; }
-            if (color === void 0) { color = 'black'; }
-            this.pos = pos;
-            //for better performance use cavasdata? https://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
-            //ctx.fillRect(pos.x, pos.y, 1, 1);
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, radius, 0, 2 * Math.PI, false);
-            ctx.fillStyle = color;
-            ctx.fill();
-        }
-        return Circle;
-    }());
-    TPosObjects.Circle = Circle;
-})(TPosObjects || (TPosObjects = {}));
 //# sourceMappingURL=Tiling.js.map
