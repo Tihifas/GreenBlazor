@@ -81,6 +81,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="index.html" />
+    <Content Include="Pages\PlotterDemos.html" />
     <Content Include="Pages\FactoryDemos.html" />
     <Content Include="Pages\ImageGalleryDemo.html" />
     <Content Include="Pages\CropImageDemo.html" />
@@ -103,6 +104,8 @@
     <TypeScriptCompile Include="Demo1.ts" />
     <TypeScriptCompile Include="Draw.ts" />
     <TypeScriptCompile Include="ImageHandler.ts" />
+    <TypeScriptCompile Include="PlotterDemos.ts" />
+    <TypeScriptCompile Include="Plotters.ts" />
     <TypeScriptCompile Include="PosObjects.ts" />
     <TypeScriptCompile Include="TMath.ts" />
     <TypeScriptCompile Include="Vector.ts" />

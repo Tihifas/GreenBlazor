@@ -17,7 +17,7 @@
         cw = canvas.width = img.width;
         ch = canvas.height = img.height;
 
-        let path = TCanvasLib.polygonPath(60, 3, 6, 200);
+        let path = TCanvasLib.polygonPath(new TMath.Vector(60, 3), 6, 200);
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 6;
         ctx.stroke(path);

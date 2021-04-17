@@ -353,7 +353,7 @@ function cropImageDemo() {
     function crop() {
         cw = canvas.width = img.width;
         ch = canvas.height = img.height;
-        var path = TCanvasLib.polygonPath(60, 3, 6, 200);
+        var path = TCanvasLib.polygonPath(new TMath.Vector(60, 3), 6, 200);
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 6;
         ctx.stroke(path);
@@ -479,4 +479,94 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
+var TPlotters;
+(function (TPlotters) {
+    //TODO: defautl a1, a2
+    function rectangle(ctx, x, y, width, height, factory, a1, a2) {
+        var origin = new TMath.Vector(x, y);
+        var canvas = ctx.canvas;
+        var mMax = Math.ceil(canvas.width / a1.x);
+        var nMax = Math.ceil(canvas.height / a2.y);
+        for (var n = 0; n <= nMax; n++) {
+            var mMin = 0;
+            var pos0 = void 0;
+            while (true) {
+                pos0 = TMath.Vector.add(a1.scale(mMin), a2.scale(n));
+                if (pos0.x > 0) {
+                    mMin--;
+                }
+                else {
+                    break;
+                }
+            }
+            for (var m = mMin; m <= mMax; m++) {
+                var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
+                pos.add(origin);
+                if (insideCanvas(canvas, pos.x, pos.y) || m == mMin) { //allowing the first point to be outside
+                    factory.create(pos);
+                }
+                else {
+                    break;
+                }
+            }
+            //TODO: delete
+            //let mNAME = 0;
+            //while (true) {
+            //    mNAME--;
+            //    let xNAME = a1.x
+            //    if (true) {
+            //    }
+            //    else {
+            //        break;
+            //    }
+            //}
+        }
+    }
+    TPlotters.rectangle = rectangle;
+    function FillCtx(ctx, factory, a1, a2) {
+        rectangle(ctx, 0, 0, ctx.canvas.width, ctx.canvas.height, factory, a1, a2);
+    }
+    TPlotters.FillCtx = FillCtx;
+    function insideCanvas(canvas, x, y) {
+        if (x < 0)
+            return false;
+        if (x > canvas.width)
+            return false;
+        if (y < 0)
+            return false;
+        if (y > canvas.width)
+            return false;
+        return true;
+    }
+    TPlotters.insideCanvas = insideCanvas;
+})(TPlotters || (TPlotters = {}));
+var TPlotterDemos;
+(function (TPlotterDemos) {
+    function mouseDemo() {
+        var mouse = new TMath.Vector(undefined, undefined);
+        var ctx = TCanvasLib.getDefaultCtx();
+        //let factory = TFactories.PosDiameterColorObjectFactory.logisticDiameterFactory(ctx, mouse);
+        var factory = new TFactories.CircleFactory(ctx);
+        var spacing = 20;
+        var a1 = new TMath.Vector(spacing, 0);
+        var a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing * spacing - (spacing / 2) * (spacing / 2)));
+        function draw(mouse) {
+            TPlotters.FillCtx(ctx, factory, a1, a2);
+            //factory.create(mouse);
+        }
+        draw(new TMath.Vector(30, 30));
+        //window.addEventListener('mousemove',
+        //    function (event) {
+        //        let canvas = ctx.canvas;
+        //        mouse.x = event.x;
+        //        mouse.y = event.y;
+        //        mouse.x = mouse.x - canvas.offsetLeft;
+        //        mouse.y = mouse.y - canvas.offsetTop;
+        //        //TODO redraw
+        //        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        //        draw(mouse);
+        //    });
+    }
+    TPlotterDemos.mouseDemo = mouseDemo;
+})(TPlotterDemos || (TPlotterDemos = {}));
 //# sourceMappingURL=Tiling.js.map
