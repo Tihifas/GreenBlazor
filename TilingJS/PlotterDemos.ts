@@ -4,15 +4,21 @@
 
         let ctx = TCanvasLib.getDefaultCtx();
 
-        let spacing = 20;
+        //TODO canvas gradient https://www.youtube.com/watch?v=Ug8u_raENl8
+
+
+        //naming as https://en.wikipedia.org/wiki/Hexagon
+        let d = 20; //inner circle diameter = x spacing
+        let a2y = Math.sqrt(d*d - (d/2)*(d/2));
 
         //Hexagonal close packing (also works with circles)
-        let a1 = new TMath.Vector(spacing, 0);
-        let a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing * spacing - (spacing / 2) * (spacing / 2)));
+        let a1 = new TMath.Vector(d, 0);
+        let a2 = new TMath.Vector(d/2, a2y);
+        let D = 2 / Math.sqrt(3) * d; //circumscribed circle diameter = hexagon "diameter"
         function draw(mouse) {
             //let factory = new TFactories.CircleFactory(ctx);
             //factory.create(mouse);
-            let factory = TFactories.PosDiameterColorObjectFactory.logisticColorHexagonFactory(ctx, mouse);
+            let factory = TFactories.PosDiameterColorObjectFactory.logisticColorHexagonFactory(ctx, mouse, D);
             TPlotters.FillCtx(ctx, factory, a1, a2);
         }
 

@@ -44,7 +44,7 @@ var TCanvasLib;
             var canvas = canvases[i];
             //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
             var dpi = window.devicePixelRatio;
-            dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
+            //dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
             //get CSS height
             //the + prefix casts it to an integer
             //the slice method gets rid of "px"
@@ -381,14 +381,18 @@ var TPlotterDemos;
     function mouseDemo() {
         var mouse = new TMath.Vector(undefined, undefined);
         var ctx = TCanvasLib.getDefaultCtx();
-        var spacing = 20;
+        //TODO canvas gradient https://www.youtube.com/watch?v=Ug8u_raENl8
+        //naming as https://en.wikipedia.org/wiki/Hexagon
+        var d = 20; //inner circle diameter = x spacing
+        var a2y = Math.sqrt(d * d - (d / 2) * (d / 2));
         //Hexagonal close packing (also works with circles)
-        var a1 = new TMath.Vector(spacing, 0);
-        var a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing * spacing - (spacing / 2) * (spacing / 2)));
+        var a1 = new TMath.Vector(d, 0);
+        var a2 = new TMath.Vector(d / 2, a2y);
+        var D = 2 / Math.sqrt(3) * d; //circumscribed circle diameter = hexagon "diameter"
         function draw(mouse) {
             //let factory = new TFactories.CircleFactory(ctx);
             //factory.create(mouse);
-            var factory = TFactories.PosDiameterColorObjectFactory.logisticColorHexagonFactory(ctx, mouse);
+            var factory = TFactories.PosDiameterColorObjectFactory.logisticColorHexagonFactory(ctx, mouse, D);
             TPlotters.FillCtx(ctx, factory, a1, a2);
         }
         //draw(new TMath.Vector(0,0));
@@ -449,6 +453,50 @@ var TPlotters;
     }
     TPlotters.insideCanvas = insideCanvas;
 })(TPlotters || (TPlotters = {}));
+function demo1() {
+    var canvas = document.querySelector('canvas');
+    var canvasW = window.innerWidth;
+    var canvasH = window.innerHeight;
+    canvas.width = canvasW;
+    canvas.height = canvasH;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'blue';
+    var diameter = 100;
+    var nRows = 4;
+    var nColumns = 6;
+    var xMin = 100;
+    var xStep = 150;
+    var yMin = 50;
+    var yStep = 150;
+    var nSides = 3;
+    for (var j = 0; j < nRows; j++) {
+        var y = yMin + yStep * j;
+        for (var i = 0; i < nColumns; i++) {
+            var x = xMin + i * xStep;
+            var pos = new TMath.Vector(x, y);
+            TCanvasLib.fillPolygon(pos, nSides, diameter, ctx);
+            nSides++;
+        }
+    }
+    //let image = document.querySelector('img');
+    //let sd = new ImageDrawer(ctx, image, 400);
+    //sd.draw(50, 50);
+    //let images = document.querySelectorAll('img');
+    //let xMin: number = 100;
+    //let xStep: number = 100;
+    //for (var i = 0; i < images.length; i++) {
+    //    let x = xMin + i * xStep;
+    //    let y = 100;
+    //    let image = images[i];
+    //    let sd = new ImageDrawer(ctx, image);
+    //    sd.draw(x, y);
+    //}
+    //let sd = new SimpleDrawable(
+    //ctx);
+    //for (var x = xMin; x <= xMax; x += xStep) {
+    //    sd.draw(x, 50);
+    //}
+}
 var TPosObjects;
 (function (TPosObjects) {
     var Circle = /** @class */ (function () {
@@ -543,48 +591,4 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-function demo1() {
-    var canvas = document.querySelector('canvas');
-    var canvasW = window.innerWidth;
-    var canvasH = window.innerHeight;
-    canvas.width = canvasW;
-    canvas.height = canvasH;
-    var ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'blue';
-    var diameter = 100;
-    var nRows = 4;
-    var nColumns = 6;
-    var xMin = 100;
-    var xStep = 150;
-    var yMin = 50;
-    var yStep = 150;
-    var nSides = 3;
-    for (var j = 0; j < nRows; j++) {
-        var y = yMin + yStep * j;
-        for (var i = 0; i < nColumns; i++) {
-            var x = xMin + i * xStep;
-            var pos = new TMath.Vector(x, y);
-            TCanvasLib.fillPolygon(pos, nSides, diameter, ctx);
-            nSides++;
-        }
-    }
-    //let image = document.querySelector('img');
-    //let sd = new ImageDrawer(ctx, image, 400);
-    //sd.draw(50, 50);
-    //let images = document.querySelectorAll('img');
-    //let xMin: number = 100;
-    //let xStep: number = 100;
-    //for (var i = 0; i < images.length; i++) {
-    //    let x = xMin + i * xStep;
-    //    let y = 100;
-    //    let image = images[i];
-    //    let sd = new ImageDrawer(ctx, image);
-    //    sd.draw(x, y);
-    //}
-    //let sd = new SimpleDrawable(
-    //ctx);
-    //for (var x = xMin; x <= xMax; x += xStep) {
-    //    sd.draw(x, 50);
-    //}
-}
 //# sourceMappingURL=Tiling.js.map

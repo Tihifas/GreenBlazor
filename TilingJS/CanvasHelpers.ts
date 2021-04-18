@@ -11,7 +11,7 @@
             let canvas = canvases[i];
             //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
             let dpi = window.devicePixelRatio;
-            dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
+            //dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
             //get CSS height
             //the + prefix casts it to an integer
             //the slice method gets rid of "px"
