@@ -55,6 +55,8 @@
         let turtle = new PathTurtle(vec);
         let innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
 
+        turtle.rotate(innerAngle/2); //default Rotated because hexagonal packing is easier
+
         for (var i = 0; i < nSides; i++) {
             turtle.move(sideL);
             turtle.rotate(innerAngle); //- to make it counterclickvise

@@ -5,16 +5,18 @@
         let ctx = TCanvasLib.getDefaultCtx();
 
         let spacing = 20;
+
+        //Hexagonal close packing (also works with circles)
         let a1 = new TMath.Vector(spacing, 0);
         let a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing * spacing - (spacing / 2) * (spacing / 2)));
         function draw(mouse) {
             //let factory = new TFactories.CircleFactory(ctx);
             //factory.create(mouse);
-            let factory = TFactories.PosDiameterColorObjectFactory.logisticDiameterFactory(ctx, mouse);
+            let factory = TFactories.PosDiameterColorObjectFactory.logisticColorHexagonFactory(ctx, mouse);
             TPlotters.FillCtx(ctx, factory, a1, a2);
         }
 
-        //draw(new TMath.Vector(30,30));
+        //draw(new TMath.Vector(0,0));
 
         window.addEventListener('mousemove',
             function (event) {

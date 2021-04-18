@@ -21,9 +21,10 @@
     export class Polygon implements IPosObject {
         pos: TMath.Vector;
 
-        constructor(ctx: CanvasRenderingContext2D, pos: TMath.Vector, diameter: number = 5, color: string = 'black') {
+        constructor(ctx: CanvasRenderingContext2D, n: number, pos: TMath.Vector, diameter: number = 5, color: string = 'blue') {
             this.pos = pos;
-            TCanvasLib.fillPolygon(pos, 6, diameter, ctx);
+            ctx.fillStyle = color;
+            TCanvasLib.fillPolygon(pos, n, diameter, ctx);
         }
     }
 }

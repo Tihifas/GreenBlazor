@@ -92,12 +92,25 @@
                 = (ctx, pos, diameter, color) => new TPosObjects.Circle(ctx, pos, diameter / 2, color);
             factory.diameterDelegate = (pos) => TMath.logisticFunction(TMath.Vector.subtract(pos, center).norm(), diameterMax, x0, growthFactor);
             factory.colorDelegate = (pos) => color;
+            return factory;
+        }
 
-            //UNDO
-            //var gradient = tinygradient();
-            //tinycolor.
-            //Tinygradient.
+        //TODO: make using gradient
+        static logisticColorHexagonFactory(ctx: CanvasRenderingContext2D, center: TMath.Vector, diameter: number = 20, x0: number = 20, growthFactor = 0.02, color: string = "blue")
+            : PosDiameterColorObjectFactory {
+            let factory = new TFactories.PosDiameterColorObjectFactory(ctx);
+            factory.posObjectFactoryDelegate
+                = (ctx, pos, diameter, color) => new TPosObjects.Polygon(ctx, 6, pos, diameter, color);
+            factory.colorDelegate = (pos) => {
+                //let colorPercent = TMath.logisticFunction(TMath.Vector.subtract(pos, center).norm(), 100, x0, growthFactor);
+                //let color: string = "rgb(" + 0 + "%," + 0 + "%," + colorPercent + "%)";
+                let dist = TMath.Vector.subtract(pos, center).norm();
+                let alpha = 1 - TMath.logisticFunction(dist, 1, x0, growthFactor);
+                let color = `rgba(0,0,255,${alpha})`;
+                return color;
+            }
 
+            factory.diameterDelegate = (pos) => diameter;
             return factory;
         }
     }
