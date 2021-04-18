@@ -37,12 +37,14 @@ var TCanvasLib;
         return canvas.getContext('2d');
     }
     TCanvasLib.getDefaultCtx = getDefaultCtx;
-    function fixAllCanvasesDpi() {
+    //TODO: call when resizing window
+    function fixAllCanvasesDpi1() {
         var canvases = document.getElementsByTagName("canvas");
         for (var i = 0; i < canvases.length; i++) {
             var canvas = canvases[i];
             //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
             var dpi = window.devicePixelRatio;
+            dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
             //get CSS height
             //the + prefix casts it to an integer
             //the slice method gets rid of "px"
@@ -54,7 +56,22 @@ var TCanvasLib;
             canvas.setAttribute('width', "" + style_width * dpi);
         }
     }
-    TCanvasLib.fixAllCanvasesDpi = fixAllCanvasesDpi;
+    TCanvasLib.fixAllCanvasesDpi1 = fixAllCanvasesDpi1;
+    function fixAllCanvasesDpi2() {
+        var canvases = document.getElementsByTagName("canvas");
+        for (var i = 0; i < canvases.length; i++) {
+            var canvas = canvases[i];
+            //Inspired by https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
+            // Set actual size in memory (scaled to account for extra pixel density).
+            var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
+            canvas.width = Math.floor(canvas.width * scale);
+            canvas.height = Math.floor(canvas.height * scale);
+            // Normalize coordinate system to use css pixels.
+            var ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+        }
+    }
+    TCanvasLib.fixAllCanvasesDpi2 = fixAllCanvasesDpi2;
     function strokePolygon(vec, nSides, diameter, ctx) {
         var path = polygonPath(vec, nSides, diameter);
         ctx.stroke(path);
@@ -386,6 +403,78 @@ function imageGalleryDemo() {
 }
 function LoadAllFiles(path) {
 }
+var TPlotterDemos;
+(function (TPlotterDemos) {
+    function mouseDemo() {
+        var mouse = new TMath.Vector(undefined, undefined);
+        var ctx = TCanvasLib.getDefaultCtx();
+        var spacing = 20;
+        var a1 = new TMath.Vector(spacing, 0);
+        var a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing * spacing - (spacing / 2) * (spacing / 2)));
+        function draw(mouse) {
+            //let factory = new TFactories.CircleFactory(ctx);
+            //factory.create(mouse);
+            var factory = TFactories.PosDiameterColorObjectFactory.logisticDiameterFactory(ctx, mouse);
+            TPlotters.FillCtx(ctx, factory, a1, a2);
+        }
+        //draw(new TMath.Vector(30,30));
+        window.addEventListener('mousemove', function (event) {
+            var canvas = ctx.canvas;
+            mouse.x = event.x;
+            mouse.y = event.y;
+            mouse.x = mouse.x - canvas.offsetLeft;
+            mouse.y = mouse.y - canvas.offsetTop;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            draw(mouse);
+            console.log(mouse);
+        });
+    }
+    TPlotterDemos.mouseDemo = mouseDemo;
+})(TPlotterDemos || (TPlotterDemos = {}));
+var TPlotters;
+(function (TPlotters) {
+    //TODO: defautl a1, a2
+    function rectangle(ctx, x, y, width, height, factory, a1, a2) {
+        var origin = new TMath.Vector(x, y);
+        var canvas = ctx.canvas;
+        var mMaxIfa2IsVertical = Math.ceil(canvas.width / a1.x);
+        var nMax = Math.ceil(canvas.height / a2.y);
+        //if(a2.x < 0)
+        //let mMin = Math.min(0, -mMax); //TODO this tries to plot a lot outside, so might not be efficient
+        //let nMin = Math.min(0, -nMax);
+        for (var n = 0; n <= nMax; n++) {
+            //Correcting for a2.x displacement
+            var xDisplacement = n * a2.x;
+            var inA1xs = xDisplacement / a1.x;
+            var mMin = -Math.floor(inA1xs);
+            var mMaxCorrected = mMaxIfa2IsVertical - Math.ceil(inA1xs);
+            for (var m = mMin; m <= mMaxCorrected; m++) {
+                var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
+                pos.add(origin);
+                if (insideCanvas(canvas, pos.x, pos.y)) {
+                    factory.create(pos);
+                }
+            }
+        }
+    }
+    TPlotters.rectangle = rectangle;
+    function FillCtx(ctx, factory, a1, a2) {
+        rectangle(ctx, 0, 0, ctx.canvas.width, ctx.canvas.height, factory, a1, a2);
+    }
+    TPlotters.FillCtx = FillCtx;
+    function insideCanvas(canvas, x, y) {
+        if (x < 0)
+            return false;
+        if (x > canvas.width)
+            return false;
+        if (y < 0)
+            return false;
+        if (y > canvas.width)
+            return false;
+        return true;
+    }
+    TPlotters.insideCanvas = insideCanvas;
+})(TPlotters || (TPlotters = {}));
 var TPosObjects;
 (function (TPosObjects) {
     var Circle = /** @class */ (function () {
@@ -479,94 +568,4 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TPlotters;
-(function (TPlotters) {
-    //TODO: defautl a1, a2
-    function rectangle(ctx, x, y, width, height, factory, a1, a2) {
-        var origin = new TMath.Vector(x, y);
-        var canvas = ctx.canvas;
-        var mMax = Math.ceil(canvas.width / a1.x);
-        var nMax = Math.ceil(canvas.height / a2.y);
-        for (var n = 0; n <= nMax; n++) {
-            var mMin = 0;
-            var pos0 = void 0;
-            while (true) {
-                pos0 = TMath.Vector.add(a1.scale(mMin), a2.scale(n));
-                if (pos0.x > 0) {
-                    mMin--;
-                }
-                else {
-                    break;
-                }
-            }
-            for (var m = mMin; m <= mMax; m++) {
-                var pos = TMath.Vector.add(a1.scale(m), a2.scale(n));
-                pos.add(origin);
-                if (insideCanvas(canvas, pos.x, pos.y) || m == mMin) { //allowing the first point to be outside
-                    factory.create(pos);
-                }
-                else {
-                    break;
-                }
-            }
-            //TODO: delete
-            //let mNAME = 0;
-            //while (true) {
-            //    mNAME--;
-            //    let xNAME = a1.x
-            //    if (true) {
-            //    }
-            //    else {
-            //        break;
-            //    }
-            //}
-        }
-    }
-    TPlotters.rectangle = rectangle;
-    function FillCtx(ctx, factory, a1, a2) {
-        rectangle(ctx, 0, 0, ctx.canvas.width, ctx.canvas.height, factory, a1, a2);
-    }
-    TPlotters.FillCtx = FillCtx;
-    function insideCanvas(canvas, x, y) {
-        if (x < 0)
-            return false;
-        if (x > canvas.width)
-            return false;
-        if (y < 0)
-            return false;
-        if (y > canvas.width)
-            return false;
-        return true;
-    }
-    TPlotters.insideCanvas = insideCanvas;
-})(TPlotters || (TPlotters = {}));
-var TPlotterDemos;
-(function (TPlotterDemos) {
-    function mouseDemo() {
-        var mouse = new TMath.Vector(undefined, undefined);
-        var ctx = TCanvasLib.getDefaultCtx();
-        //let factory = TFactories.PosDiameterColorObjectFactory.logisticDiameterFactory(ctx, mouse);
-        var factory = new TFactories.CircleFactory(ctx);
-        var spacing = 20;
-        var a1 = new TMath.Vector(spacing, 0);
-        var a2 = new TMath.Vector(spacing / 2, Math.sqrt(spacing * spacing - (spacing / 2) * (spacing / 2)));
-        function draw(mouse) {
-            TPlotters.FillCtx(ctx, factory, a1, a2);
-            //factory.create(mouse);
-        }
-        draw(new TMath.Vector(30, 30));
-        //window.addEventListener('mousemove',
-        //    function (event) {
-        //        let canvas = ctx.canvas;
-        //        mouse.x = event.x;
-        //        mouse.y = event.y;
-        //        mouse.x = mouse.x - canvas.offsetLeft;
-        //        mouse.y = mouse.y - canvas.offsetTop;
-        //        //TODO redraw
-        //        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        //        draw(mouse);
-        //    });
-    }
-    TPlotterDemos.mouseDemo = mouseDemo;
-})(TPlotterDemos || (TPlotterDemos = {}));
 //# sourceMappingURL=Tiling.js.map

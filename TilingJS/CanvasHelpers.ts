@@ -4,12 +4,14 @@
         return canvas.getContext('2d');
     }
 
-    export function fixAllCanvasesDpi() {
+    //TODO: call when resizing window
+    export function fixAllCanvasesDpi1() {
         let canvases = document.getElementsByTagName("canvas");
         for (var i = 0; i < canvases.length; i++) {
             let canvas = canvases[i];
             //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
             let dpi = window.devicePixelRatio;
+            dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
             //get CSS height
             //the + prefix casts it to an integer
             //the slice method gets rid of "px"
@@ -19,6 +21,22 @@
             //scale the canvas
             canvas.setAttribute('height', "" + style_height * dpi);
             canvas.setAttribute('width', "" + style_width * dpi);
+        }
+    }
+
+    export function fixAllCanvasesDpi2() {
+        let canvases = document.getElementsByTagName("canvas");
+        for (var i = 0; i < canvases.length; i++) {
+            let canvas = canvases[i];
+            //Inspired by https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
+            // Set actual size in memory (scaled to account for extra pixel density).
+            var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
+            canvas.width = Math.floor(canvas.width * scale);
+            canvas.height = Math.floor(canvas.height * scale);
+
+            // Normalize coordinate system to use css pixels.
+            let ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
         }
     }
 
