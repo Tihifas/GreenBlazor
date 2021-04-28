@@ -622,15 +622,20 @@ var TDemos;
     function CopyHexagonDemo() {
         var ctx = TCanvasLib.getDefaultCtx();
         var pos0 = new TMath.Vector(200, 100);
-        TCanvasLib.strokePolygon(pos0, 6, 200, ctx);
+        TCanvasLib.strokePolygon(new TMath.Vector(200, 100), 6, 200, ctx);
+        TCanvasLib.strokePolygon(new TMath.Vector(300, 100), 6, 200, ctx);
+        TCanvasLib.strokePolygon(new TMath.Vector(400, 100), 6, 200, ctx);
         var recSideL = 400;
         var fromPath = TCanvasLib.polygonPathBySideL(new TMath.Vector(0, 0), 4, recSideL, 0);
         ctx.stroke(fromPath);
-        var toPoint = new TMath.Vector(recSideL, 0);
+        var toPoint = new TMath.Vector(600, 0);
         var destinationPath = TCanvasLib.polygonPathBySideL(toPoint, 4, recSideL, 0);
         ctx.stroke(destinationPath);
         var canvas = ctx.canvas;
-        ctx.drawImage(canvas, 0, 0, recSideL, recSideL, recSideL, 0, recSideL, recSideL);
+        //ctx.translate(toPoint.x + recSideL / 2, toPoint.y + recSideL/2);
+        //ctx.rotate(Math.PI/4);
+        //ctx.translate(0, 0);
+        ctx.drawImage(canvas, 0, 0, recSideL, recSideL, toPoint.x, toPoint.y, recSideL, recSideL);
     }
     TDemos.CopyHexagonDemo = CopyHexagonDemo;
 })(TDemos || (TDemos = {}));
