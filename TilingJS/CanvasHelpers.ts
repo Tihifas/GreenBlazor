@@ -11,7 +11,7 @@
             let canvas = canvases[i];
             //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
             let dpi = window.devicePixelRatio;
-            //dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
+            dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
             //get CSS height
             //the + prefix casts it to an integer
             //the slice method gets rid of "px"
@@ -40,22 +40,43 @@
         }
     }
 
-    export function strokePolygon(vec: TMath.Vector, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
-        let path = polygonPath(vec, nSides, diameter);
+    export function strokePolygonBySideL(pos0: TMath.Vector, nSides: number, sideL: number, ctx: CanvasRenderingContext2D) {
+        let cDiameter = sideL * (1.0 / Math.sin(Math.PI /nSides));
+        strokePolygon(pos0, nSides, cDiameter, ctx);
+    }
+
+    //cDiameter: Circumscribed diabeter https://en.wikipedia.org/wiki/Regular_polygon#Circumradius
+    export function strokePolygon(pos0: TMath.Vector, nSides: number, cDiameter: number, ctx: CanvasRenderingContext2D) {
+        let path = polygonPath(pos0, nSides, cDiameter);
         ctx.stroke(path);
     }
 
-    export function fillPolygon(pos0: TMath.Vector, nSides: number, diameter: number, ctx: CanvasRenderingContext2D) {
-        let path = polygonPath(pos0, nSides, diameter);
+    export function fillPolygonBySideL(pos0: TMath.Vector, nSides: number, sideL: number, ctx: CanvasRenderingContext2D) {
+        let cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        fillPolygon(pos0, nSides, cDiameter, ctx);
+    }
+
+    export function fillPolygon(pos0: TMath.Vector, nSides: number, cDiameter: number, ctx: CanvasRenderingContext2D) {
+        let path = polygonPath(pos0, nSides, cDiameter);
         ctx.fill(path);
     }
 
-    export function polygonPath(vec: TMath.Vector, nSides: number, diameter: number) {
-        let sideL = diameter * Math.sin(Math.PI / nSides);
-        let turtle = new PathTurtle(vec);
+    export function polygonPathBySideL(pos0: TMath.Vector, nSides: number, sideL: number, angle0Override = null) {
+        let cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        return polygonPath(pos0, nSides, cDiameter, angle0Override);
+    }
+
+    export function polygonPath(pos0: TMath.Vector, nSides: number, cDiameter: number, angle0Override = null) {
+        let sideL = cDiameter * Math.sin(Math.PI / nSides);
+        let turtle = new PathTurtle(pos0);
         let innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
 
-        turtle.rotate(innerAngle/2); //default Rotated because hexagonal packing is easier
+        if (angle0Override === null) {
+            turtle.rotate(innerAngle / 2); //default Rotated because hexagonal packing is easier
+        }
+        else {
+            turtle.rotate(angle0Override);
+        }
 
         for (var i = 0; i < nSides; i++) {
             turtle.move(sideL);
@@ -106,4 +127,9 @@
             this.rotation += angle;
         }
     }
+
+    //TODO change to accept path
+//    export function copyPasteCanvasRectangle() {
+    
+//}
 }

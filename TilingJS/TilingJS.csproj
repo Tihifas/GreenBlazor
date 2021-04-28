@@ -81,6 +81,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="index.html" />
+    <Content Include="Pages\CanvasCopyPasteDemos.html" />
     <Content Include="Pages\PlotterDemos.html" />
     <Content Include="Pages\FactoryDemos.html" />
     <Content Include="Pages\ImageGalleryDemo.html" />
@@ -98,6 +99,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="Alerter.ts" />
+    <TypeScriptCompile Include="CanvasCopyPasteDemos.ts" />
     <TypeScriptCompile Include="Factories.ts" />
     <TypeScriptCompile Include="FactoryDemos.ts" />
     <TypeScriptCompile Include="ImageDemos.ts" />

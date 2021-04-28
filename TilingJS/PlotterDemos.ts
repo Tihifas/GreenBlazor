@@ -19,7 +19,7 @@
             //let factory = new TFactories.CircleFactory(ctx);
             //factory.create(mouse);
             let factory = TFactories.PosDiameterColorObjectFactory.logisticColorHexagonFactory(ctx, mouse, D);
-            TPlotters.FillCtx(ctx, factory, a1, a2);
+            TPlotters.fillCtx(ctx, factory, a1, a2);
         }
 
         //draw(new TMath.Vector(0,0));

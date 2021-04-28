@@ -25,7 +25,7 @@
         }
     }
 
-    export function FillCtx(ctx: CanvasRenderingContext2D, factory: TFactories.IPosObjectFactory, a1: TMath.Vector, a2: TMath.Vector) {
+    export function fillCtx(ctx: CanvasRenderingContext2D, factory: TFactories.IPosObjectFactory, a1: TMath.Vector, a2: TMath.Vector) {
         rectangle(ctx, 0, 0, ctx.canvas.width, ctx.canvas.height, factory, a1, a2);
     }
 

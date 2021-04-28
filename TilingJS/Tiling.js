@@ -44,7 +44,7 @@ var TCanvasLib;
             var canvas = canvases[i];
             //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
             var dpi = window.devicePixelRatio;
-            //dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
+            dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
             //get CSS height
             //the + prefix casts it to an integer
             //the slice method gets rid of "px"
@@ -72,21 +72,44 @@ var TCanvasLib;
         }
     }
     TCanvasLib.fixAllCanvasesDpi2 = fixAllCanvasesDpi2;
-    function strokePolygon(vec, nSides, diameter, ctx) {
-        var path = polygonPath(vec, nSides, diameter);
+    function strokePolygonBySideL(pos0, nSides, sideL, ctx) {
+        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        strokePolygon(pos0, nSides, cDiameter, ctx);
+    }
+    TCanvasLib.strokePolygonBySideL = strokePolygonBySideL;
+    //cDiameter: Circumscribed diabeter https://en.wikipedia.org/wiki/Regular_polygon#Circumradius
+    function strokePolygon(pos0, nSides, cDiameter, ctx) {
+        var path = polygonPath(pos0, nSides, cDiameter);
         ctx.stroke(path);
     }
     TCanvasLib.strokePolygon = strokePolygon;
-    function fillPolygon(pos0, nSides, diameter, ctx) {
-        var path = polygonPath(pos0, nSides, diameter);
+    function fillPolygonBySideL(pos0, nSides, sideL, ctx) {
+        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        fillPolygon(pos0, nSides, cDiameter, ctx);
+    }
+    TCanvasLib.fillPolygonBySideL = fillPolygonBySideL;
+    function fillPolygon(pos0, nSides, cDiameter, ctx) {
+        var path = polygonPath(pos0, nSides, cDiameter);
         ctx.fill(path);
     }
     TCanvasLib.fillPolygon = fillPolygon;
-    function polygonPath(vec, nSides, diameter) {
-        var sideL = diameter * Math.sin(Math.PI / nSides);
-        var turtle = new PathTurtle(vec);
+    function polygonPathBySideL(pos0, nSides, sideL, angle0Override) {
+        if (angle0Override === void 0) { angle0Override = null; }
+        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        return polygonPath(pos0, nSides, cDiameter, angle0Override);
+    }
+    TCanvasLib.polygonPathBySideL = polygonPathBySideL;
+    function polygonPath(pos0, nSides, cDiameter, angle0Override) {
+        if (angle0Override === void 0) { angle0Override = null; }
+        var sideL = cDiameter * Math.sin(Math.PI / nSides);
+        var turtle = new PathTurtle(pos0);
         var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
-        turtle.rotate(innerAngle / 2); //default Rotated because hexagonal packing is easier
+        if (angle0Override === null) {
+            turtle.rotate(innerAngle / 2); //default Rotated because hexagonal packing is easier
+        }
+        else {
+            turtle.rotate(angle0Override);
+        }
         for (var i = 0; i < nSides; i++) {
             turtle.move(sideL);
             turtle.rotate(innerAngle); //- to make it counterclickvise
@@ -127,6 +150,9 @@ var TCanvasLib;
         return PathTurtle;
     }());
     TCanvasLib.PathTurtle = PathTurtle;
+    //TODO change to accept path
+    //    export function copyPasteCanvasRectangle() {
+    //}
 })(TCanvasLib || (TCanvasLib = {}));
 //Draw in constructor instead?
 var SimpleDrawable = /** @class */ (function () {
@@ -393,7 +419,7 @@ var TPlotterDemos;
             //let factory = new TFactories.CircleFactory(ctx);
             //factory.create(mouse);
             var factory = TFactories.PosDiameterColorObjectFactory.logisticColorHexagonFactory(ctx, mouse, D);
-            TPlotters.FillCtx(ctx, factory, a1, a2);
+            TPlotters.fillCtx(ctx, factory, a1, a2);
         }
         //draw(new TMath.Vector(0,0));
         window.addEventListener('mousemove', function (event) {
@@ -436,10 +462,10 @@ var TPlotters;
         }
     }
     TPlotters.rectangle = rectangle;
-    function FillCtx(ctx, factory, a1, a2) {
+    function fillCtx(ctx, factory, a1, a2) {
         rectangle(ctx, 0, 0, ctx.canvas.width, ctx.canvas.height, factory, a1, a2);
     }
-    TPlotters.FillCtx = FillCtx;
+    TPlotters.fillCtx = fillCtx;
     function insideCanvas(canvas, x, y) {
         if (x < 0)
             return false;
@@ -591,4 +617,21 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
+var TDemos;
+(function (TDemos) {
+    function CopyHexagonDemo() {
+        var ctx = TCanvasLib.getDefaultCtx();
+        var pos0 = new TMath.Vector(200, 100);
+        TCanvasLib.strokePolygon(pos0, 6, 200, ctx);
+        var recSideL = 400;
+        var fromPath = TCanvasLib.polygonPathBySideL(new TMath.Vector(0, 0), 4, recSideL, 0);
+        ctx.stroke(fromPath);
+        var toPoint = new TMath.Vector(recSideL, 0);
+        var destinationPath = TCanvasLib.polygonPathBySideL(toPoint, 4, recSideL, 0);
+        ctx.stroke(destinationPath);
+        var canvas = ctx.canvas;
+        ctx.drawImage(canvas, 0, 0, recSideL, recSideL, recSideL, 0, recSideL, recSideL);
+    }
+    TDemos.CopyHexagonDemo = CopyHexagonDemo;
+})(TDemos || (TDemos = {}));
 //# sourceMappingURL=Tiling.js.map
