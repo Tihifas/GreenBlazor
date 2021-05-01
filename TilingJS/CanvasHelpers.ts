@@ -4,23 +4,27 @@
         return canvas.getContext('2d');
     }
 
+    export function fixCanvasDpi(canvas: HTMLCanvasElement) {
+        //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
+        let dpi = window.devicePixelRatio;
+        dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
+        //get CSS height
+        //the + prefix casts it to an integer
+        //the slice method gets rid of "px"
+        let style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
+        //get CSS width
+        let style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
+        //scale the canvas
+        canvas.setAttribute('height', "" + style_height * dpi);
+        canvas.setAttribute('width', "" + style_width * dpi);
+    }
+
     //TODO: call when resizing window
     export function fixAllCanvasesDpi1() {
         let canvases = document.getElementsByTagName("canvas");
         for (var i = 0; i < canvases.length; i++) {
             let canvas = canvases[i];
-            //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
-            let dpi = window.devicePixelRatio;
-            dpi = dpi * 2/3; //On desktop it was * 1, og laptop it was * 2/3
-            //get CSS height
-            //the + prefix casts it to an integer
-            //the slice method gets rid of "px"
-            let style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
-            //get CSS width
-            let style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
-            //scale the canvas
-            canvas.setAttribute('height', "" + style_height * dpi);
-            canvas.setAttribute('width', "" + style_width * dpi);
+            fixCanvasDpi(canvas);
         }
     }
 
@@ -41,7 +45,7 @@
     }
 
     export function strokePolygonBySideL(pos0: TMath.Vector, nSides: number, sideL: number, ctx: CanvasRenderingContext2D) {
-        let cDiameter = sideL * (1.0 / Math.sin(Math.PI /nSides));
+        let cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
         strokePolygon(pos0, nSides, cDiameter, ctx);
     }
 
@@ -129,7 +133,7 @@
     }
 
     //TODO change to accept path
-//    export function copyPasteCanvasRectangle() {
-    
-//}
+    //    export function copyPasteCanvasRectangle() {
+
+    //}
 }

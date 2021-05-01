@@ -30,6 +30,46 @@ window.onload = function () {
     //var alerter = new Alerter();
     //alerter.alert('ALERT');
 };
+var TDemos;
+(function (TDemos) {
+    function CopyHexagonDemo() {
+        //let nCanvases = 10;
+        var nCanvases = 1;
+        var canvasHeight = 400;
+        var canvasWidth = 800;
+        var left = 50;
+        var top = 100;
+        //let canvases = TCanvasTagCreation.MakeCanvasColumn(nCanvases, canvasHeight, canvasWidth, left, top);
+        for (var i = 0; i < nCanvases; i++) {
+            //let canvas = TCanvasTagCreation.MakeCanvas(left, top, canvasWidth, canvasHeight);
+            ////let canvas = canvases[i];
+            //let ctx = canvas.getContext("2d");
+            var ctx = TCanvasLib.getDefaultCtx();
+            var canvas = ctx.canvas;
+            canvas.style.border = "1px solid black";
+            ctx.fillStyle = 'black';
+            var arrowTip = new TMath.Vector(canvasHeight / 3, canvasWidth / 4);
+            ctx.fillRect(200, 200, 50, 50);
+            ctx.fillRect(arrowTip.x, arrowTip.y, 10, canvasHeight / 3);
+            TCanvasLib.fillPolygonBySideL(arrowTip, 4, 20, ctx);
+            //let pos0 = new TMath.Vector(200, 100);
+            //TCanvasLib.strokePolygon(new TMath.Vector(200, 100), 6, 200, ctx);
+            //TCanvasLib.strokePolygon(new TMath.Vector(300, 100), 6, 200, ctx);
+            //TCanvasLib.strokePolygon(new TMath.Vector(400, 100), 6, 200, ctx);
+            //let recSideL = 400;
+            //let fromPath = TCanvasLib.polygonPathBySideL(new TMath.Vector(0, 0), 4, recSideL, 0);
+            //ctx.stroke(fromPath);
+            //let toPoint = new TMath.Vector(600, 0);
+            //let destinationPath = TCanvasLib.polygonPathBySideL(toPoint, 4, recSideL, 0);
+            //ctx.stroke(destinationPath);
+            ////ctx.translate(toPoint.x + recSideL / 2, toPoint.y + recSideL/2);
+            //ctx.rotate(Math.PI / 4);
+            ////ctx.translate(0, 0);
+            //ctx.drawImage(canvas, 0, 0, recSideL, recSideL, toPoint.x, toPoint.y, recSideL, recSideL);
+        }
+    }
+    TDemos.CopyHexagonDemo = CopyHexagonDemo;
+})(TDemos || (TDemos = {}));
 var TCanvasLib;
 (function (TCanvasLib) {
     function getDefaultCtx() {
@@ -37,23 +77,27 @@ var TCanvasLib;
         return canvas.getContext('2d');
     }
     TCanvasLib.getDefaultCtx = getDefaultCtx;
+    function fixCanvasDpi(canvas) {
+        //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
+        var dpi = window.devicePixelRatio;
+        dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
+        //get CSS height
+        //the + prefix casts it to an integer
+        //the slice method gets rid of "px"
+        var style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
+        //get CSS width
+        var style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
+        //scale the canvas
+        canvas.setAttribute('height', "" + style_height * dpi);
+        canvas.setAttribute('width', "" + style_width * dpi);
+    }
+    TCanvasLib.fixCanvasDpi = fixCanvasDpi;
     //TODO: call when resizing window
     function fixAllCanvasesDpi1() {
         var canvases = document.getElementsByTagName("canvas");
         for (var i = 0; i < canvases.length; i++) {
             var canvas = canvases[i];
-            //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
-            var dpi = window.devicePixelRatio;
-            dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
-            //get CSS height
-            //the + prefix casts it to an integer
-            //the slice method gets rid of "px"
-            var style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
-            //get CSS width
-            var style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
-            //scale the canvas
-            canvas.setAttribute('height', "" + style_height * dpi);
-            canvas.setAttribute('width', "" + style_width * dpi);
+            fixCanvasDpi(canvas);
         }
     }
     TCanvasLib.fixAllCanvasesDpi1 = fixAllCanvasesDpi1;
@@ -617,26 +661,43 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TDemos;
-(function (TDemos) {
-    function CopyHexagonDemo() {
-        var ctx = TCanvasLib.getDefaultCtx();
-        var pos0 = new TMath.Vector(200, 100);
-        TCanvasLib.strokePolygon(new TMath.Vector(200, 100), 6, 200, ctx);
-        TCanvasLib.strokePolygon(new TMath.Vector(300, 100), 6, 200, ctx);
-        TCanvasLib.strokePolygon(new TMath.Vector(400, 100), 6, 200, ctx);
-        var recSideL = 400;
-        var fromPath = TCanvasLib.polygonPathBySideL(new TMath.Vector(0, 0), 4, recSideL, 0);
-        ctx.stroke(fromPath);
-        var toPoint = new TMath.Vector(600, 0);
-        var destinationPath = TCanvasLib.polygonPathBySideL(toPoint, 4, recSideL, 0);
-        ctx.stroke(destinationPath);
-        var canvas = ctx.canvas;
-        //ctx.translate(toPoint.x + recSideL / 2, toPoint.y + recSideL/2);
-        //ctx.rotate(Math.PI/4);
-        //ctx.translate(0, 0);
-        ctx.drawImage(canvas, 0, 0, recSideL, recSideL, toPoint.x, toPoint.y, recSideL, recSideL);
+var TCanvasTagCreation;
+(function (TCanvasTagCreation) {
+    function MakeCanvas(x, y, width, height, parentElmnt, fixCanvasDpi) {
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (parentElmnt == null) {
+            parentElmnt = document.body;
+        }
+        var canvas = document.createElement("canvas");
+        if (fixCanvasDpi)
+            TCanvasLib.fixCanvasDpi(canvas);
+        canvas.style.position = "absolute";
+        canvas.style.left = x + 'px';
+        canvas.style.top = y + 'px';
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+        parentElmnt.appendChild(canvas);
+        return canvas;
     }
-    TDemos.CopyHexagonDemo = CopyHexagonDemo;
-})(TDemos || (TDemos = {}));
+    TCanvasTagCreation.MakeCanvas = MakeCanvas;
+    function MakeCanvasColumn(n, heightOfOne, width, x, y, parentElmnt, fixCanvasDpi) {
+        if (width === void 0) { width = null; }
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (width === null)
+            throw new Error("notimplemented"); //TODO screen/parent width
+        var yCurrent = y;
+        var canvases = new Array(n);
+        for (var i = 0; i < n; i++) {
+            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, parentElmnt, fixCanvasDpi);
+            yCurrent += heightOfOne;
+            canvases[i] = canvas;
+        }
+        return canvases;
+    }
+    TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
+})(TCanvasTagCreation || (TCanvasTagCreation = {}));
 //# sourceMappingURL=Tiling.js.map
