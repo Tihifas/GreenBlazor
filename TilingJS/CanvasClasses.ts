@@ -19,32 +19,16 @@
         }
     }
 
-    export class Line {
-        point: TMath.Vector;
-        angle: number;
-        parallelVector: TMath.Vector;
+    //Abandoned because confusing to make line without plotting it
+    //export class Line {
+    //    point: TMath.Vector;
+    //    parallelVector: TMath.Vector;
+    //    angle: TMath.Angle;
 
-        constructor(point: TMath.Vector, angle: number) {
-            this.point = point;
-            this.angle = angle;
-            this.parallelVector = new TMath.Vector(Math.cos(angle), Math.sin(angle));
-        }
-
-        public drawOnCtx(ctx: CanvasRenderingContext2D) {
-            let canvas = ctx.canvas;
-            let canvasW = canvas.width;
-            let canvasH = canvas.height;
-            let lineLength = new TMath.Vector(canvasW, canvasH).norm();
-            let lineVector = this.parallelVector.copy().scale(lineLength/2);
-            TCanvasLib.drawLine(ctx, this.point, lineVector);
-            lineVector.scale(-1);
-            TCanvasLib.drawLine(ctx, this.point, lineVector);
-        }
-
-        public static drawLineOnCtx(point: TMath.Vector, angle: number, ctx: CanvasRenderingContext2D): Line {
-            let line = new Line(point, angle);
-            line.drawOnCtx(ctx);
-            return line;
-        }
-    }
+    //    constructor(point: TMath.Vector, angle: TMath.Angle) {
+    //        this.point = point;
+    //        this.angle = angle;
+    //        this.parallelVector = new TMath.Vector(Math.cos(angle.degreesFromXPos), Math.sin(angle.degreesFromXPos));
+    //    }
+    //}
 }

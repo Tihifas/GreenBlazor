@@ -10,8 +10,36 @@
         get radiansFromYNeg(): number { return -this.angle + Math.PI/2; }
         get degreesFromYNeg(): number { return Angle.radiansToDegrees(this.radiansFromYNeg); }
 
+        get inPIs(): number { return this.angle / Math.PI; }
+
         constructor(radiansFromXPos: number) {
             this.angle = radiansFromXPos;
+        }
+
+        public copy(): Angle {
+            return new Angle(this.angle);
+        }
+
+        public cos(): number {
+            return Math.cos(this.angle);
+        }
+
+        public sin(): number {
+            return Math.sin(this.angle);
+        }
+
+        public scale(a: number): Angle {
+            this.angle = this.angle * a;
+            return this;
+        }
+
+        public add(otherAngle: Angle): Angle {
+            this.angle += otherAngle.angle;
+            return this;
+        }
+
+        public static add(angle1: Angle, angle2: Angle): Angle {
+            return new Angle(angle1.angle + angle2.angle);
         }
 
         public static fromRadiansFromYNeg(radiansFromYNeg: number) {

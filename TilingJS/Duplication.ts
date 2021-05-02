@@ -3,6 +3,7 @@
         rotation.rotateCtx(ctx);
         ctx.drawImage(ctx.canvas, sourceRect.left, sourceRect.top, sourceRect.width, sourceRect.height,
                         dx, dy, sourceRect.width, sourceRect.height);
+        ctx.resetTransform();
     }
 
 

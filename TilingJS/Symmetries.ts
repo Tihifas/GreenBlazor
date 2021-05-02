@@ -7,7 +7,7 @@
         constructor(pos: TMath.Vector, period: number) {
             this.pos = pos;
             this.period = period;
-            this.angle = TMath.Angle.fromRadiansFromYNeg(2 * Math.PI / period);
+            this.angle = new TMath.Angle(2 * Math.PI / period);
         }
 
         //If applyToRect not set then it applies to entire canvas
@@ -21,7 +21,8 @@
             }
 
             let rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
-            for (var i = 0; i < this.period; i++) {
+            //for (var i = 1; i <= this.period; i++) {
+            for (var i = 1; i <= 1; i++) { //TODO: undo
                 TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
 
@@ -32,11 +33,12 @@
 
         public drawSymmetryLines(ctx: CanvasRenderingContext2D, lineL: number = null) {
             for (var i = 0; i < this.period; i++) {
-                let parallelVector = TMath.Vector.fromPolar(1, i * this.angle.radiansFromXPos);
-                TCanvasLib.drawLine(ctx, this.pos, parallelVector, "1px dashed black");
+                let rotationAngle = new TMath.Angle(-Math.PI/2)
+                                        .add(this.angle.copy().scale(i));
+
+                TCanvasLib.drawLineByAngle(this.pos, rotationAngle, ctx);
                 if (lineL != null) throw new Error("not implemented");
             }
-            //ctx.line
         }
     }
 }

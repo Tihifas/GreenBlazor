@@ -16,8 +16,8 @@
         }
 
         //From x-axis
-        public static fromPolar(a: number, angle: number): Vector {
-            return new Vector(a * Math.cos(angle), a * Math.sin(angle));
+        public static fromPolar(a: number, angle: Angle): Vector {
+            return new Vector(a * angle.cos(), a * angle.sin());
         }
 
         public copy(): Vector {

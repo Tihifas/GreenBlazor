@@ -122,12 +122,26 @@
         }
     }
 
-    export function drawLine(ctx: CanvasRenderingContext2D, point: TMath.Vector, parallelVector: TMath.Vector, strokeStyle: string = null) {
+    export function drawLineByVector(ctx: CanvasRenderingContext2D, point: TMath.Vector, vector: TMath.Vector, strokeStyle: string = null) {
         if (strokeStyle != null) ctx.strokeStyle = strokeStyle;
-        ctx.moveTo(point.x, point.y);
+        let destination = TMath.Vector.add(point, vector);
+
         ctx.beginPath();
-        let destination = TMath.Vector.add(point, parallelVector);
-        ctx.moveTo(destination.x, destination.y);
+        ctx.moveTo(point.x, point.y);
+        ctx.lineTo(destination.x, destination.y);
         ctx.stroke();
+    }
+
+    export function drawLineByAngle(point: TMath.Vector, angle: TMath.Angle, ctx: CanvasRenderingContext2D, bothDirections: boolean = true, strokeStyle = null) {
+        let canvas = ctx.canvas;
+        let canvasW = canvas.width;
+        let canvasH = canvas.height;
+        let lineLength = Math.sqrt(canvasW * canvasW + canvasH * canvasH);
+        let lineVector = TMath.Vector.fromPolar(lineLength, angle);
+        TCanvasLib.drawLineByVector(ctx, point, lineVector, strokeStyle);
+        if (bothDirections) {
+            lineVector.scale(-1);
+            TCanvasLib.drawLineByVector(ctx, point, lineVector, strokeStyle);
+        }
     }
 }
