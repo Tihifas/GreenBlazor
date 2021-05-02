@@ -113,7 +113,7 @@
     <TypeScriptCompile Include="PosObjects.ts" />
     <TypeScriptCompile Include="TMath.ts" />
     <TypeScriptCompile Include="Vector.ts" />
-    <TypeScriptCompile Include="CanvasHelpers.ts" />
+    <TypeScriptCompile Include="CanvasLib.ts" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />

@@ -111,18 +111,8 @@
         }
 
         move(length: number) {
-            //todo delete
-            //let canvas = document.querySelector('canvas');
-            //let ctx = canvas.getContext('2d');
-            //ctx.moveTo(this.pos.x, this.pos.y);
-
             let dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
             this.pos.add(dPos);
-
-            //todo delete
-            //ctx.lineTo(this.pos.x, this.pos.y);
-            //ctx.stroke();
-
             this.lineToPos();
         }
 
@@ -136,4 +126,19 @@
     //    export function copyPasteCanvasRectangle() {
 
     //}
+
+    export class Rotation {
+        angle: number;
+        rotationPoint: TMath.Vector;
+        constructor(angle: number, rotationPoint: TMath.Vector) {
+            this.angle = angle;
+            this.rotationPoint = rotationPoint;
+        }
+
+        rotateCtx(ctx: CanvasRenderingContext2D) {
+            ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
+            ctx.rotate(this.angle);
+            ctx.translate(-this.rotationPoint.x, -this.rotationPoint.y);
+        }
+    }
 }

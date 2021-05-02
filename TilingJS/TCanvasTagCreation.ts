@@ -10,10 +10,10 @@
         canvas.style.position = "absolute";
         canvas.style.left = x + 'px';
         canvas.style.top= y + 'px';
-        canvas.style.width = width + 'px';  
-        canvas.style.height = height + 'px';
+        canvas.width = width;
+        canvas.height = height;
 
-        parentElmnt.appendChild(canvas);
+        parentElmnt.appendChild(canvas); 
         return canvas;
     }
 

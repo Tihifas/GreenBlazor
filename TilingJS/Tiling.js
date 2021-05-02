@@ -33,171 +33,47 @@ window.onload = function () {
 var TDemos;
 (function (TDemos) {
     function CopyHexagonDemo() {
-        //let nCanvases = 10;
-        var nCanvases = 1;
+        var nCanvases = 10;
         var canvasHeight = 400;
         var canvasWidth = 800;
         var left = 50;
         var top = 100;
-        //let canvases = TCanvasTagCreation.MakeCanvasColumn(nCanvases, canvasHeight, canvasWidth, left, top);
+        var canvases = TCanvasTagCreation.MakeCanvasColumn(nCanvases, canvasHeight, canvasWidth, left, top);
         for (var i = 0; i < nCanvases; i++) {
             //let canvas = TCanvasTagCreation.MakeCanvas(left, top, canvasWidth, canvasHeight);
-            ////let canvas = canvases[i];
-            //let ctx = canvas.getContext("2d");
-            var ctx = TCanvasLib.getDefaultCtx();
-            var canvas = ctx.canvas;
+            var canvas = canvases[i];
+            var ctx = canvas.getContext("2d");
+            //let ctx = TCanvasLib.getDefaultCtx();
+            //let canvas = ctx.canvas;
+            //TCanvasLib.fixCanvasDpi(canvas);
+            //ctx.fillStyle = 'blue';
+            //ctx.fillRect(0, 0, canvasWidth/2, canvasHeight);
+            ctx.fillRect(canvasWidth / 2, 0, 2, canvasHeight);
             canvas.style.border = "1px solid black";
-            ctx.fillStyle = 'black';
-            var arrowTip = new TMath.Vector(canvasHeight / 3, canvasWidth / 4);
-            ctx.fillRect(200, 200, 50, 50);
-            ctx.fillRect(arrowTip.x, arrowTip.y, 10, canvasHeight / 3);
-            TCanvasLib.fillPolygonBySideL(arrowTip, 4, 20, ctx);
-            //let pos0 = new TMath.Vector(200, 100);
-            //TCanvasLib.strokePolygon(new TMath.Vector(200, 100), 6, 200, ctx);
-            //TCanvasLib.strokePolygon(new TMath.Vector(300, 100), 6, 200, ctx);
-            //TCanvasLib.strokePolygon(new TMath.Vector(400, 100), 6, 200, ctx);
-            //let recSideL = 400;
-            //let fromPath = TCanvasLib.polygonPathBySideL(new TMath.Vector(0, 0), 4, recSideL, 0);
-            //ctx.stroke(fromPath);
-            //let toPoint = new TMath.Vector(600, 0);
-            //let destinationPath = TCanvasLib.polygonPathBySideL(toPoint, 4, recSideL, 0);
-            //ctx.stroke(destinationPath);
-            ////ctx.translate(toPoint.x + recSideL / 2, toPoint.y + recSideL/2);
-            //ctx.rotate(Math.PI / 4);
-            ////ctx.translate(0, 0);
-            //ctx.drawImage(canvas, 0, 0, recSideL, recSideL, toPoint.x, toPoint.y, recSideL, recSideL);
+            drawArrow(canvasWidth, canvasHeight, ctx);
+            var rotationPoint0 = new TMath.Vector(canvasWidth / 4, canvasHeight / 2);
+            new TPosObjects.Circle(ctx, rotationPoint0, 10, 'red');
+            var recSideL = canvasWidth / 2;
+            var toPoint = new TMath.Vector(recSideL, 0);
+            var translationVector = new TMath.Vector(canvasWidth / 2, 0);
+            var rotationPointReal = TMath.Vector.add(rotationPoint0, translationVector);
+            var angle = Math.PI / 8 * i;
+            var rotation = new TCanvasLib.Rotation(angle, rotationPointReal);
+            TDuplication.copyRectAndRotate(ctx, 0, 0, recSideL - 2, recSideL - 2, toPoint.x, toPoint.y, rotation);
         }
     }
     TDemos.CopyHexagonDemo = CopyHexagonDemo;
+    function drawArrow(canvasWidth, canvasHeight, ctx) {
+        var arrowCenter = new TMath.Vector(canvasWidth / 4, canvasHeight / 2);
+        var arrowWidth = 20;
+        var arrowLength = canvasHeight / 4;
+        var arrowPointSideL = 10;
+        var arrowTip = new TMath.Vector(arrowCenter.x, arrowCenter.y - arrowLength / 2 - arrowPointSideL);
+        ctx.fillRect(arrowCenter.x - arrowWidth / 4, arrowCenter.y - arrowLength / 2, arrowPointSideL, arrowLength);
+        TCanvasLib.fillPolygonBySideL(arrowTip, 4, 20, ctx);
+        return arrowTip;
+    }
 })(TDemos || (TDemos = {}));
-var TCanvasLib;
-(function (TCanvasLib) {
-    function getDefaultCtx() {
-        var canvas = document.querySelector('canvas');
-        return canvas.getContext('2d');
-    }
-    TCanvasLib.getDefaultCtx = getDefaultCtx;
-    function fixCanvasDpi(canvas) {
-        //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
-        var dpi = window.devicePixelRatio;
-        dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
-        //get CSS height
-        //the + prefix casts it to an integer
-        //the slice method gets rid of "px"
-        var style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
-        //get CSS width
-        var style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
-        //scale the canvas
-        canvas.setAttribute('height', "" + style_height * dpi);
-        canvas.setAttribute('width', "" + style_width * dpi);
-    }
-    TCanvasLib.fixCanvasDpi = fixCanvasDpi;
-    //TODO: call when resizing window
-    function fixAllCanvasesDpi1() {
-        var canvases = document.getElementsByTagName("canvas");
-        for (var i = 0; i < canvases.length; i++) {
-            var canvas = canvases[i];
-            fixCanvasDpi(canvas);
-        }
-    }
-    TCanvasLib.fixAllCanvasesDpi1 = fixAllCanvasesDpi1;
-    function fixAllCanvasesDpi2() {
-        var canvases = document.getElementsByTagName("canvas");
-        for (var i = 0; i < canvases.length; i++) {
-            var canvas = canvases[i];
-            //Inspired by https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
-            // Set actual size in memory (scaled to account for extra pixel density).
-            var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
-            canvas.width = Math.floor(canvas.width * scale);
-            canvas.height = Math.floor(canvas.height * scale);
-            // Normalize coordinate system to use css pixels.
-            var ctx = canvas.getContext('2d');
-            ctx.scale(scale, scale);
-        }
-    }
-    TCanvasLib.fixAllCanvasesDpi2 = fixAllCanvasesDpi2;
-    function strokePolygonBySideL(pos0, nSides, sideL, ctx) {
-        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
-        strokePolygon(pos0, nSides, cDiameter, ctx);
-    }
-    TCanvasLib.strokePolygonBySideL = strokePolygonBySideL;
-    //cDiameter: Circumscribed diabeter https://en.wikipedia.org/wiki/Regular_polygon#Circumradius
-    function strokePolygon(pos0, nSides, cDiameter, ctx) {
-        var path = polygonPath(pos0, nSides, cDiameter);
-        ctx.stroke(path);
-    }
-    TCanvasLib.strokePolygon = strokePolygon;
-    function fillPolygonBySideL(pos0, nSides, sideL, ctx) {
-        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
-        fillPolygon(pos0, nSides, cDiameter, ctx);
-    }
-    TCanvasLib.fillPolygonBySideL = fillPolygonBySideL;
-    function fillPolygon(pos0, nSides, cDiameter, ctx) {
-        var path = polygonPath(pos0, nSides, cDiameter);
-        ctx.fill(path);
-    }
-    TCanvasLib.fillPolygon = fillPolygon;
-    function polygonPathBySideL(pos0, nSides, sideL, angle0Override) {
-        if (angle0Override === void 0) { angle0Override = null; }
-        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
-        return polygonPath(pos0, nSides, cDiameter, angle0Override);
-    }
-    TCanvasLib.polygonPathBySideL = polygonPathBySideL;
-    function polygonPath(pos0, nSides, cDiameter, angle0Override) {
-        if (angle0Override === void 0) { angle0Override = null; }
-        var sideL = cDiameter * Math.sin(Math.PI / nSides);
-        var turtle = new PathTurtle(pos0);
-        var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
-        if (angle0Override === null) {
-            turtle.rotate(innerAngle / 2); //default Rotated because hexagonal packing is easier
-        }
-        else {
-            turtle.rotate(angle0Override);
-        }
-        for (var i = 0; i < nSides; i++) {
-            turtle.move(sideL);
-            turtle.rotate(innerAngle); //- to make it counterclickvise
-        }
-        return turtle.getPath();
-    }
-    TCanvasLib.polygonPath = polygonPath;
-    var PathTurtle = /** @class */ (function () {
-        function PathTurtle(pos0, rotation) {
-            if (rotation === void 0) { rotation = 0; }
-            this.path = new Path2D();
-            this.pos = pos0;
-            this.rotation = rotation;
-            this.path.moveTo(this.pos.x, this.pos.y);
-        }
-        PathTurtle.prototype.getPath = function () {
-            return this.path;
-        };
-        PathTurtle.prototype.lineToPos = function () {
-            this.path.lineTo(this.pos.x, this.pos.y);
-        };
-        PathTurtle.prototype.move = function (length) {
-            //todo delete
-            //let canvas = document.querySelector('canvas');
-            //let ctx = canvas.getContext('2d');
-            //ctx.moveTo(this.pos.x, this.pos.y);
-            var dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
-            this.pos.add(dPos);
-            //todo delete
-            //ctx.lineTo(this.pos.x, this.pos.y);
-            //ctx.stroke();
-            this.lineToPos();
-        };
-        //radians
-        PathTurtle.prototype.rotate = function (angle) {
-            this.rotation += angle;
-        };
-        return PathTurtle;
-    }());
-    TCanvasLib.PathTurtle = PathTurtle;
-    //TODO change to accept path
-    //    export function copyPasteCanvasRectangle() {
-    //}
-})(TCanvasLib || (TCanvasLib = {}));
 //Draw in constructor instead?
 var SimpleDrawable = /** @class */ (function () {
     function SimpleDrawable(ctx) {
@@ -238,6 +114,20 @@ var ClipDrawer = /** @class */ (function () {
     };
     return ClipDrawer;
 }());
+var TDuplication;
+(function (TDuplication) {
+    function copyRectAndRotate(ctx, sx, sy, sw, sh, dx, dy, rotation) {
+        rotation.rotateCtx(ctx);
+        ctx.drawImage(ctx.canvas, sx, sy, sw, sh, dx, dy, sw, sh);
+    }
+    TDuplication.copyRectAndRotate = copyRectAndRotate;
+    //export function CopyAndTransformRegion(region: Path2D, ctx: CanvasRenderingContext2D)
+    //export function rotateAroundPoint(angle: number, point: TMath.Vector, ctx: CanvasRenderingContext2D) {
+    //    let cosA = Math.cos(angle);
+    //    let sinA = Math.sin(angle);
+    //    ctx.setTransform(cosA, -sinA, sinA, cosA, point.x, point.y);
+    //}
+})(TDuplication || (TDuplication = {}));
 var TFactories;
 (function (TFactories) {
     //MAKE FACTORIES USING BUILDER PATTERN?
@@ -596,6 +486,45 @@ var TPosObjects;
     }());
     TPosObjects.Polygon = Polygon;
 })(TPosObjects || (TPosObjects = {}));
+var TCanvasTagCreation;
+(function (TCanvasTagCreation) {
+    function MakeCanvas(x, y, width, height, parentElmnt, fixCanvasDpi) {
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (parentElmnt == null) {
+            parentElmnt = document.body;
+        }
+        var canvas = document.createElement("canvas");
+        if (fixCanvasDpi)
+            TCanvasLib.fixCanvasDpi(canvas);
+        canvas.style.position = "absolute";
+        canvas.style.left = x + 'px';
+        canvas.style.top = y + 'px';
+        canvas.width = width;
+        canvas.height = height;
+        parentElmnt.appendChild(canvas);
+        return canvas;
+    }
+    TCanvasTagCreation.MakeCanvas = MakeCanvas;
+    function MakeCanvasColumn(n, heightOfOne, width, x, y, parentElmnt, fixCanvasDpi) {
+        if (width === void 0) { width = null; }
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (width === null)
+            throw new Error("notimplemented"); //TODO screen/parent width
+        var yCurrent = y;
+        var canvases = new Array(n);
+        for (var i = 0; i < n; i++) {
+            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, parentElmnt, fixCanvasDpi);
+            yCurrent += heightOfOne;
+            canvases[i] = canvas;
+        }
+        return canvases;
+    }
+    TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
+})(TCanvasTagCreation || (TCanvasTagCreation = {}));
 var TMath;
 (function (TMath) {
     function logisticFunction(x, maxValue, x0, growthRate) {
@@ -661,43 +590,138 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TCanvasTagCreation;
-(function (TCanvasTagCreation) {
-    function MakeCanvas(x, y, width, height, parentElmnt, fixCanvasDpi) {
-        if (parentElmnt === void 0) { parentElmnt = null; }
-        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
-        if (parentElmnt == null) {
-            parentElmnt = document.body;
-        }
-        var canvas = document.createElement("canvas");
-        if (fixCanvasDpi)
-            TCanvasLib.fixCanvasDpi(canvas);
-        canvas.style.position = "absolute";
-        canvas.style.left = x + 'px';
-        canvas.style.top = y + 'px';
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-        parentElmnt.appendChild(canvas);
-        return canvas;
+var TCanvasLib;
+(function (TCanvasLib) {
+    function getDefaultCtx() {
+        var canvas = document.querySelector('canvas');
+        return canvas.getContext('2d');
     }
-    TCanvasTagCreation.MakeCanvas = MakeCanvas;
-    function MakeCanvasColumn(n, heightOfOne, width, x, y, parentElmnt, fixCanvasDpi) {
-        if (width === void 0) { width = null; }
-        if (x === void 0) { x = 0; }
-        if (y === void 0) { y = 0; }
-        if (parentElmnt === void 0) { parentElmnt = null; }
-        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
-        if (width === null)
-            throw new Error("notimplemented"); //TODO screen/parent width
-        var yCurrent = y;
-        var canvases = new Array(n);
-        for (var i = 0; i < n; i++) {
-            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, parentElmnt, fixCanvasDpi);
-            yCurrent += heightOfOne;
-            canvases[i] = canvas;
-        }
-        return canvases;
+    TCanvasLib.getDefaultCtx = getDefaultCtx;
+    function fixCanvasDpi(canvas) {
+        //Copied from https://medium.com/wdstack/fixing-html5-2d-canvas-blur-8ebe27db07da
+        var dpi = window.devicePixelRatio;
+        dpi = dpi * 2 / 3; //On desktop it was * 1, og laptop it was * 2/3
+        //get CSS height
+        //the + prefix casts it to an integer
+        //the slice method gets rid of "px"
+        var style_height = +window.getComputedStyle(canvas).getPropertyValue("height").slice(0, -2);
+        //get CSS width
+        var style_width = +window.getComputedStyle(canvas).getPropertyValue("width").slice(0, -2);
+        //scale the canvas
+        canvas.setAttribute('height', "" + style_height * dpi);
+        canvas.setAttribute('width', "" + style_width * dpi);
     }
-    TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
-})(TCanvasTagCreation || (TCanvasTagCreation = {}));
+    TCanvasLib.fixCanvasDpi = fixCanvasDpi;
+    //TODO: call when resizing window
+    function fixAllCanvasesDpi1() {
+        var canvases = document.getElementsByTagName("canvas");
+        for (var i = 0; i < canvases.length; i++) {
+            var canvas = canvases[i];
+            fixCanvasDpi(canvas);
+        }
+    }
+    TCanvasLib.fixAllCanvasesDpi1 = fixAllCanvasesDpi1;
+    function fixAllCanvasesDpi2() {
+        var canvases = document.getElementsByTagName("canvas");
+        for (var i = 0; i < canvases.length; i++) {
+            var canvas = canvases[i];
+            //Inspired by https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
+            // Set actual size in memory (scaled to account for extra pixel density).
+            var scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
+            canvas.width = Math.floor(canvas.width * scale);
+            canvas.height = Math.floor(canvas.height * scale);
+            // Normalize coordinate system to use css pixels.
+            var ctx = canvas.getContext('2d');
+            ctx.scale(scale, scale);
+        }
+    }
+    TCanvasLib.fixAllCanvasesDpi2 = fixAllCanvasesDpi2;
+    function strokePolygonBySideL(pos0, nSides, sideL, ctx) {
+        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        strokePolygon(pos0, nSides, cDiameter, ctx);
+    }
+    TCanvasLib.strokePolygonBySideL = strokePolygonBySideL;
+    //cDiameter: Circumscribed diabeter https://en.wikipedia.org/wiki/Regular_polygon#Circumradius
+    function strokePolygon(pos0, nSides, cDiameter, ctx) {
+        var path = polygonPath(pos0, nSides, cDiameter);
+        ctx.stroke(path);
+    }
+    TCanvasLib.strokePolygon = strokePolygon;
+    function fillPolygonBySideL(pos0, nSides, sideL, ctx) {
+        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        fillPolygon(pos0, nSides, cDiameter, ctx);
+    }
+    TCanvasLib.fillPolygonBySideL = fillPolygonBySideL;
+    function fillPolygon(pos0, nSides, cDiameter, ctx) {
+        var path = polygonPath(pos0, nSides, cDiameter);
+        ctx.fill(path);
+    }
+    TCanvasLib.fillPolygon = fillPolygon;
+    function polygonPathBySideL(pos0, nSides, sideL, angle0Override) {
+        if (angle0Override === void 0) { angle0Override = null; }
+        var cDiameter = sideL * (1.0 / Math.sin(Math.PI / nSides));
+        return polygonPath(pos0, nSides, cDiameter, angle0Override);
+    }
+    TCanvasLib.polygonPathBySideL = polygonPathBySideL;
+    function polygonPath(pos0, nSides, cDiameter, angle0Override) {
+        if (angle0Override === void 0) { angle0Override = null; }
+        var sideL = cDiameter * Math.sin(Math.PI / nSides);
+        var turtle = new PathTurtle(pos0);
+        var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
+        if (angle0Override === null) {
+            turtle.rotate(innerAngle / 2); //default Rotated because hexagonal packing is easier
+        }
+        else {
+            turtle.rotate(angle0Override);
+        }
+        for (var i = 0; i < nSides; i++) {
+            turtle.move(sideL);
+            turtle.rotate(innerAngle); //- to make it counterclickvise
+        }
+        return turtle.getPath();
+    }
+    TCanvasLib.polygonPath = polygonPath;
+    var PathTurtle = /** @class */ (function () {
+        function PathTurtle(pos0, rotation) {
+            if (rotation === void 0) { rotation = 0; }
+            this.path = new Path2D();
+            this.pos = pos0;
+            this.rotation = rotation;
+            this.path.moveTo(this.pos.x, this.pos.y);
+        }
+        PathTurtle.prototype.getPath = function () {
+            return this.path;
+        };
+        PathTurtle.prototype.lineToPos = function () {
+            this.path.lineTo(this.pos.x, this.pos.y);
+        };
+        PathTurtle.prototype.move = function (length) {
+            var dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
+            this.pos.add(dPos);
+            this.lineToPos();
+        };
+        //radians
+        PathTurtle.prototype.rotate = function (angle) {
+            this.rotation += angle;
+        };
+        return PathTurtle;
+    }());
+    TCanvasLib.PathTurtle = PathTurtle;
+    //TODO change to accept path
+    //    export function copyPasteCanvasRectangle() {
+    //}
+    var Rotation = /** @class */ (function () {
+        function Rotation(angle, rotationPoint) {
+            this.angle = angle;
+            this.rotationPoint = rotationPoint;
+        }
+        Rotation.prototype.rotateCtx = function (ctx) {
+            ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
+            ctx.rotate(this.angle);
+            ctx.translate(-this.rotationPoint.x, -this.rotationPoint.y);
+        };
+        return Rotation;
+    }());
+    TCanvasLib.Rotation = Rotation;
+})(TCanvasLib || (TCanvasLib = {}));
 //# sourceMappingURL=Tiling.js.map
