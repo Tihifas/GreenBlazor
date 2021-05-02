@@ -81,6 +81,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="index.html" />
+    <Content Include="Pages\GyrationDemo.html" />
     <Content Include="Pages\CanvasCopyPasteDemos.html" />
     <Content Include="Pages\PlotterDemos.html" />
     <Content Include="Pages\FactoryDemos.html" />
@@ -97,9 +98,13 @@
     <Content Include="wwwroot\images\IMG_20180424_073829.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Angle.ts" />
     <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="Alerter.ts" />
+    <TypeScriptCompile Include="CanvasClasses.ts" />
     <TypeScriptCompile Include="CanvasCopyPasteDemos.ts" />
+    <TypeScriptCompile Include="Symmetries.ts" />
+    <TypeScriptCompile Include="SymmetryDemos.ts" />
     <TypeScriptCompile Include="TCanvasTagCreation.ts" />
     <TypeScriptCompile Include="Duplication.ts" />
     <TypeScriptCompile Include="Factories.ts" />

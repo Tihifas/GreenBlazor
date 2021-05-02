@@ -12,38 +12,36 @@
             let canvas = canvases[i];
             let ctx = canvas.getContext("2d");
 
-            //let ctx = TCanvasLib.getDefaultCtx();
-            //let canvas = ctx.canvas;
-            //TCanvasLib.fixCanvasDpi(canvas);
-
-            //ctx.fillStyle = 'blue';
-            //ctx.fillRect(0, 0, canvasWidth/2, canvasHeight);
+            let origin = new TMath.Vector(0,0);
 
 
             ctx.fillRect(canvasWidth / 2, 0, 2, canvasHeight);
 
             canvas.style.border = "1px solid black";
 
-            drawArrow(canvasWidth, canvasHeight, ctx);
+            let arrowCenter = new TMath.Vector(canvasWidth / 4, canvasHeight / 2);
+            drawArrow(arrowCenter, canvasWidth, canvasHeight, ctx);
 
             let rotationPoint0 = new TMath.Vector(canvasWidth / 4, canvasHeight / 2);
             new TPosObjects.Circle(ctx, rotationPoint0, 10, 'red');
 
             let recSideL = canvasWidth / 2;
-            let toPoint = new TMath.Vector(recSideL, 0);
-
+            //let translationVector = new TMath.Vector(0, 0);
             let translationVector = new TMath.Vector(canvasWidth/2, 0);
+            //let toPoint =  new TMath.Vector(recSideL, 0);
+            let toPoint = translationVector
+
             let rotationPointReal = TMath.Vector.add(rotationPoint0, translationVector);
             let angle = Math.PI / 8 * i;
 
-            let rotation = new TCanvasLib.Rotation(angle, rotationPointReal);
+            let rotation = new TCanvasClasses.Rotation(angle, rotationPointReal);
 
-            TDuplication.copyRectAndRotate(ctx, 0, 0, recSideL - 2, recSideL - 2, toPoint.x, toPoint.y, rotation);
+            let sourceRect = new TPosObjects.Rectangle(origin, canvasWidth/2-2, canvasHeight-2);
+            TDuplication.copyRectAndRotate(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
         }
     }
 
-    function drawArrow(canvasWidth: number, canvasHeight: number, ctx: CanvasRenderingContext2D) {
-        let arrowCenter = new TMath.Vector(canvasWidth/4, canvasHeight/2);
+    function drawArrow(arrowCenter: TMath.Vector, canvasWidth: number, canvasHeight: number, ctx: CanvasRenderingContext2D) {
         let arrowWidth = 20;
         let arrowLength = canvasHeight / 4;
 

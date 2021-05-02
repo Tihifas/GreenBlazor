@@ -1,8 +1,11 @@
 ﻿namespace TDuplication {
-    export function copyRectAndRotate(ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number, dx: number, dy: number, rotation: TCanvasLib.Rotation) {
+    export function copyRectAndRotate(ctx: CanvasRenderingContext2D, sourceRect: TPosObjects.Rectangle, dx: number, dy: number, rotation: TCanvasLib.Rotation) {
         rotation.rotateCtx(ctx);
-        ctx.drawImage(ctx.canvas, sx, sy, sw, sh, dx, dy, sw, sh);
+        ctx.drawImage(ctx.canvas, sourceRect.left, sourceRect.top, sourceRect.width, sourceRect.height,
+                        dx, dy, sourceRect.width, sourceRect.height);
     }
+
+
 
     //export function CopyAndTransformRegion(region: Path2D, ctx: CanvasRenderingContext2D)
     //export function rotateAroundPoint(angle: number, point: TMath.Vector, ctx: CanvasRenderingContext2D) {

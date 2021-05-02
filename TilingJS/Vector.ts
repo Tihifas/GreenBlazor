@@ -15,6 +15,15 @@
             this.y = y;
         }
 
+        //From x-axis
+        public static fromPolar(a: number, angle: number): Vector {
+            return new Vector(a * Math.cos(angle), a * Math.sin(angle));
+        }
+
+        public copy(): Vector {
+            return new Vector(this.x, this.y);
+        }
+
         public static fromRotationAndLength(rotation: number, lenght = 1) {
             let x = Math.cos(rotation) * lenght;
             let y = Math.sin(rotation) * lenght;

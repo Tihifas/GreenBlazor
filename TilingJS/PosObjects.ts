@@ -18,6 +18,23 @@
         }
     }
 
+    export class Rectangle implements IPosObject {
+        public pos: TMath.Vector;
+        public width: number;
+        public height: number;
+        get left(): number { return this.pos.x; }
+        get top(): number { return this.pos.y; }
+        get right(): number { return this.pos.x + this.width; }
+        get bottom(): number { return this.pos.y + this.height; }
+
+
+        constructor(upperLeft: TMath.Vector, width: number, height: number) {
+            this.pos = upperLeft;
+            this.width = width;
+            this.height = height;
+        }
+    }
+
     export class Polygon implements IPosObject {
         pos: TMath.Vector;
 

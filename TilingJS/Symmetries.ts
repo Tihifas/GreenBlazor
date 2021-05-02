@@ -1,0 +1,40 @@
+﻿namespace TSymmetries {
+    export class GyrationPoint {
+        pos: TMath.Vector;
+        period: number;
+        angle: number;
+
+        constructor(pos: TMath.Vector, period: number) {
+            this.pos = pos;
+            this.period = period;
+            this.angle = 2 * Math.PI / period;
+        }
+
+        //If applyToRect not set then it applies to entire canvas
+        public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null) {
+            let canvasUpperLeft = new TMath.Vector(0, 0);
+            if (applyToRect != null) throw new Error("applyToRect != null not implented");
+            else {
+                let width = ctx.canvas.width;
+                let height = ctx.canvas.height;
+                applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
+            }
+
+            let rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
+            for (var i = 0; i < this.period; i++) {
+                TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
+            }
+        }
+
+        //Angle from up
+        public function drawSymmetryLines(ctx: CanvasRenderingContext2D, lineL: number = null) {
+            for (var i = 0; i < this.period; i++) {
+                let angleFromX = this.angle
+                let parallelVector = TMath.Vector.fromPolar(1, );
+                TCanvasLib.drawLine(ctx, this.pos, );
+                if (lineL != null) throw new Error("not implemented");
+            }
+            //ctx.line
+        }
+    }
+}

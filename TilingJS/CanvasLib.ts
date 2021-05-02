@@ -122,23 +122,12 @@
         }
     }
 
-    //TODO change to accept path
-    //    export function copyPasteCanvasRectangle() {
-
-    //}
-
-    export class Rotation {
-        angle: number;
-        rotationPoint: TMath.Vector;
-        constructor(angle: number, rotationPoint: TMath.Vector) {
-            this.angle = angle;
-            this.rotationPoint = rotationPoint;
-        }
-
-        rotateCtx(ctx: CanvasRenderingContext2D) {
-            ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
-            ctx.rotate(this.angle);
-            ctx.translate(-this.rotationPoint.x, -this.rotationPoint.y);
-        }
+    export function drawLine(ctx: CanvasRenderingContext2D, point: TMath.Vector, parallelVector: TMath.Vector, strokeStyle: string = null) {
+        if (strokeStyle != null) ctx.strokeStyle = strokeStyle;
+        ctx.moveTo(point.x, point.y);
+        ctx.beginPath();
+        let destination = TMath.Vector.add(point, parallelVector);
+        ctx.moveTo(destination.x, destination.y);
+        ctx.stroke();
     }
 }
