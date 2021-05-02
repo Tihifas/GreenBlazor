@@ -1,15 +1,20 @@
 ﻿namespace TCanvasClasses {
     export class Rotation {
-        angle: number;
         rotationPoint: TMath.Vector;
-        constructor(angle: number, rotationPoint: TMath.Vector) {
+        angle: TMath.Angle;
+        constructor(angle: TMath.Angle, rotationPoint: TMath.Vector) {
             this.angle = angle;
             this.rotationPoint = rotationPoint;
         }
 
+        public static fromRadiansFromYNeg(radians, rotationPoint: TMath.Vector) {
+            let angle = TMath.Angle.fromRadiansFromYNeg(radians);
+            return new Rotation(angle, rotationPoint);
+        }
+
         rotateCtx(ctx: CanvasRenderingContext2D) {
             ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
-            ctx.rotate(-this.angle); //- because default is clockwise
+            ctx.rotate(this.angle.radiansFromYNeg); //- because default is clockwise
             ctx.translate(-this.rotationPoint.x, -this.rotationPoint.y);
         }
     }
@@ -39,6 +44,7 @@
         public static drawLineOnCtx(point: TMath.Vector, angle: number, ctx: CanvasRenderingContext2D): Line {
             let line = new Line(point, angle);
             line.drawOnCtx(ctx);
+            return line;
         }
     }
 }

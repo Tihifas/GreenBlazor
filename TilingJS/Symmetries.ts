@@ -2,16 +2,16 @@
     export class GyrationPoint {
         pos: TMath.Vector;
         period: number;
-        angle: number;
+        angle: TMath.Angle;
 
         constructor(pos: TMath.Vector, period: number) {
             this.pos = pos;
             this.period = period;
-            this.angle = 2 * Math.PI / period;
+            this.angle = TMath.Angle.fromRadiansFromYNeg(2 * Math.PI / period);
         }
 
         //If applyToRect not set then it applies to entire canvas
-        public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null) {
+        public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null, drawSymmetryLines = false) {
             let canvasUpperLeft = new TMath.Vector(0, 0);
             if (applyToRect != null) throw new Error("applyToRect != null not implented");
             else {
@@ -24,14 +24,16 @@
             for (var i = 0; i < this.period; i++) {
                 TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
+
+            if (drawSymmetryLines) {
+                this.drawSymmetryLines(ctx);
+            }
         }
 
-        //Angle from up
-        public function drawSymmetryLines(ctx: CanvasRenderingContext2D, lineL: number = null) {
+        public drawSymmetryLines(ctx: CanvasRenderingContext2D, lineL: number = null) {
             for (var i = 0; i < this.period; i++) {
-                let angleFromX = this.angle
-                let parallelVector = TMath.Vector.fromPolar(1, );
-                TCanvasLib.drawLine(ctx, this.pos, );
+                let parallelVector = TMath.Vector.fromPolar(1, i * this.angle.radiansFromXPos);
+                TCanvasLib.drawLine(ctx, this.pos, parallelVector, "1px dashed black");
                 if (lineL != null) throw new Error("not implemented");
             }
             //ctx.line

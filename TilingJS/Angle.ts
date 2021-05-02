@@ -14,8 +14,8 @@
             this.angle = radiansFromXPos;
         }
 
-        fromRadiansFromYNeg(radiansFromYNeg: number) {
-            let radiansFromXPos = -radiansFromYNeg - Math.PI / 2;
+        public static fromRadiansFromYNeg(radiansFromYNeg: number) {
+            let radiansFromXPos = -radiansFromYNeg + Math.PI / 2;
             return new Angle(radiansFromXPos);
         }
 

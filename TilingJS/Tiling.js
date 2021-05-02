@@ -57,7 +57,7 @@ var TDemos;
             var toPoint = translationVector;
             var rotationPointReal = TMath.Vector.add(rotationPoint0, translationVector);
             var angle = Math.PI / 8 * i;
-            var rotation = new TCanvasClasses.Rotation(angle, rotationPointReal);
+            var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromRadiansFromYNeg(angle), rotationPointReal);
             var sourceRect = new TPosObjects.Rectangle(origin_1, canvasWidth / 2 - 2, canvasHeight - 2);
             TDuplication.copyRectAndRotate(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
         }
@@ -516,7 +516,8 @@ var TPosObjects;
 })(TPosObjects || (TPosObjects = {}));
 var TCanvasTagCreation;
 (function (TCanvasTagCreation) {
-    function MakeCanvas(x, y, width, height, parentElmnt, fixCanvasDpi) {
+    function MakeCanvas(x, y, width, height, drawBorder, parentElmnt, fixCanvasDpi) {
+        if (drawBorder === void 0) { drawBorder = false; }
         if (parentElmnt === void 0) { parentElmnt = null; }
         if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
         if (parentElmnt == null) {
@@ -528,9 +529,11 @@ var TCanvasTagCreation;
         canvas.style.position = "absolute";
         canvas.style.left = x + 'px';
         canvas.style.top = y + 'px';
-        canvas.width = width;
+        canvas.width = width; //important to set canvas.width/height, not just canvas.style.width!
         canvas.height = height;
         parentElmnt.appendChild(canvas);
+        if (drawBorder)
+            canvas.style.border = "1px solid black";
         return canvas;
     }
     TCanvasTagCreation.MakeCanvas = MakeCanvas;
@@ -545,7 +548,7 @@ var TCanvasTagCreation;
         var yCurrent = y;
         var canvases = new Array(n);
         for (var i = 0; i < n; i++) {
-            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, parentElmnt, fixCanvasDpi);
+            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, false, parentElmnt, fixCanvasDpi);
             yCurrent += heightOfOne;
             canvases[i] = canvas;
         }
@@ -760,11 +763,12 @@ var TSymmetries;
         function GyrationPoint(pos, period) {
             this.pos = pos;
             this.period = period;
-            this.angle = 2 * Math.PI / period;
+            this.angle = TMath.Angle.fromRadiansFromYNeg(2 * Math.PI / period);
         }
         //If applyToRect not set then it applies to entire canvas
-        GyrationPoint.prototype.applyToCtx = function (ctx, applyToRect) {
+        GyrationPoint.prototype.applyToCtx = function (ctx, applyToRect, drawSymmetryLines) {
             if (applyToRect === void 0) { applyToRect = null; }
+            if (drawSymmetryLines === void 0) { drawSymmetryLines = false; }
             var canvasUpperLeft = new TMath.Vector(0, 0);
             if (applyToRect != null)
                 throw new Error("applyToRect != null not implented");
@@ -777,13 +781,15 @@ var TSymmetries;
             for (var i = 0; i < this.period; i++) {
                 TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
+            if (drawSymmetryLines) {
+                this.drawSymmetryLines(ctx);
+            }
         };
         GyrationPoint.prototype.drawSymmetryLines = function (ctx, lineL) {
             if (lineL === void 0) { lineL = null; }
             for (var i = 0; i < this.period; i++) {
-                var angleFromX = this.angle;
-                var parallelVector = TMath.Vector.fromPolar(1);
-                TCanvasLib.drawLine(ctx, this.pos);
+                var parallelVector = TMath.Vector.fromPolar(1, i * this.angle.radiansFromXPos);
+                TCanvasLib.drawLine(ctx, this.pos, parallelVector, "1px dashed black");
                 if (lineL != null)
                     throw new Error("not implemented");
             }
@@ -800,9 +806,13 @@ var TCanvasClasses;
             this.angle = angle;
             this.rotationPoint = rotationPoint;
         }
+        Rotation.fromRadiansFromYNeg = function (radians, rotationPoint) {
+            var angle = TMath.Angle.fromRadiansFromYNeg(radians);
+            return new Rotation(angle, rotationPoint);
+        };
         Rotation.prototype.rotateCtx = function (ctx) {
             ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
-            ctx.rotate(-this.angle); //- because default is clockwise
+            ctx.rotate(this.angle.radiansFromYNeg); //- because default is clockwise
             ctx.translate(-this.rotationPoint.x, -this.rotationPoint.y);
         };
         return Rotation;
@@ -827,6 +837,7 @@ var TCanvasClasses;
         Line.drawLineOnCtx = function (point, angle, ctx) {
             var line = new Line(point, angle);
             line.drawOnCtx(ctx);
+            return line;
         };
         return Line;
     }());
@@ -837,10 +848,11 @@ var TSymmetryDemos;
     function gyrationDemo() {
         var canvasW = 1200;
         var canvasH = 800;
-        var canvas = TCanvasTagCreation.MakeCanvas(0, 0, 1200, canvasW);
+        var canvas = TCanvasTagCreation.MakeCanvas(20, 80, canvasW, canvasH, true);
         var ctx = canvas.getContext("2d");
         var center = new TMath.Vector(canvasW / 2, canvasH / 2);
         var gPoint = new TSymmetries.GyrationPoint(center, 3);
+        gPoint.applyToCtx(ctx, null, true);
     }
     TSymmetryDemos.gyrationDemo = gyrationDemo;
 })(TSymmetryDemos || (TSymmetryDemos = {}));
@@ -872,8 +884,8 @@ var TMath;
             enumerable: false,
             configurable: true
         });
-        Angle.prototype.fromRadiansFromYNeg = function (radiansFromYNeg) {
-            var radiansFromXPos = -radiansFromYNeg - Math.PI / 2;
+        Angle.fromRadiansFromYNeg = function (radiansFromYNeg) {
+            var radiansFromXPos = -radiansFromYNeg + Math.PI / 2;
             return new Angle(radiansFromXPos);
         };
         Angle.radiansToDegrees = function (radians) {

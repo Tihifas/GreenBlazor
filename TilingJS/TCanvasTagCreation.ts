@@ -1,5 +1,7 @@
 ﻿namespace TCanvasTagCreation {
-    export function MakeCanvas(x: number, y:number, width: number, height: number, parentElmnt: HTMLElement = null, fixCanvasDpi = true) : HTMLCanvasElement {
+    export function MakeCanvas(x: number, y: number, width: number, height: number,
+                                drawBorder: boolean = false, parentElmnt: HTMLElement = null,
+                                fixCanvasDpi: boolean = true): HTMLCanvasElement {
         if (parentElmnt == null) {
             parentElmnt = document.body;
         }
@@ -10,10 +12,12 @@
         canvas.style.position = "absolute";
         canvas.style.left = x + 'px';
         canvas.style.top= y + 'px';
-        canvas.width = width;
+        canvas.width = width; //important to set canvas.width/height, not just canvas.style.width!
         canvas.height = height;
 
         parentElmnt.appendChild(canvas); 
+
+        if (drawBorder) canvas.style.border = "1px solid black";
         return canvas;
     }
 
@@ -23,7 +27,7 @@
         let yCurrent: number = y;
         let canvases: HTMLCanvasElement[] = new Array(n);
         for (var i = 0; i < n; i++) {
-            let canvas = MakeCanvas(x, yCurrent, width, heightOfOne, parentElmnt, fixCanvasDpi);
+            let canvas = MakeCanvas(x, yCurrent, width, heightOfOne, false, parentElmnt, fixCanvasDpi);
             yCurrent += heightOfOne;
             canvases[i] = canvas;
         }

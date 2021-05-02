@@ -34,7 +34,7 @@
             let rotationPointReal = TMath.Vector.add(rotationPoint0, translationVector);
             let angle = Math.PI / 8 * i;
 
-            let rotation = new TCanvasClasses.Rotation(angle, rotationPointReal);
+            let rotation = new TCanvasClasses.Rotation(TMath.Angle.fromRadiansFromYNeg(angle), rotationPointReal);
 
             let sourceRect = new TPosObjects.Rectangle(origin, canvasWidth/2-2, canvasHeight-2);
             TDuplication.copyRectAndRotate(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
