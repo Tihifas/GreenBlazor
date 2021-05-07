@@ -12,17 +12,16 @@
 
         //If applyToRect not set then it applies to entire canvas
         public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null, drawSymmetryLines = false) {
-            let canvasUpperLeft = new TMath.Vector(0, 0);
+                let canvasUpperLeft = new TMath.Vector(0, 0);
             if (applyToRect != null) throw new Error("applyToRect != null not implented");
             else {
                 let width = ctx.canvas.width;
                 let height = ctx.canvas.height;
                 applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
             }
-
             let rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
             //for (var i = 1; i <= this.period; i++) {
-            for (var i = 1; i <= 1; i++) { //TODO: undo
+            for (var i = 1; i <= 1; i++) { //TODO: undo, it should be period
                 TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
 
