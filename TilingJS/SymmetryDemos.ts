@@ -18,7 +18,8 @@
         ctx.lineTo(center.x+legPartsLength+footLength, center.y-legPartsLength);
         ctx.stroke();
 
-        let gPoint = new TSymmetries.GyrationPoint(center, 3);
+        //let gPoint = new TSymmetries.GyrationPoint(center, 3);
+        let gPoint = new TSymmetries.GyrationPoint(center, 2);
         gPoint.applyToCtx(ctx, null, true);
     }
 }

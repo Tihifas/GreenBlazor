@@ -81,6 +81,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="index.html" />
+    <Content Include="jest.config.js" />
     <Content Include="Pages\GyrationDemo.html" />
     <Content Include="Pages\CanvasCopyPasteDemos.html" />
     <Content Include="Pages\PlotterDemos.html" />
@@ -88,6 +89,7 @@
     <Content Include="Pages\ImageGalleryDemo.html" />
     <Content Include="Pages\CropImageDemo.html" />
     <Content Include="Pages\PolygonDemos.html" />
+    <Content Include="Tiling.test.js" />
     <Content Include="Tiling.js" />
     <Content Include="Web.config" />
     <Content Include="wwwroot\images\IMG_20180423_101732.jpg" />
@@ -98,8 +100,8 @@
     <Content Include="wwwroot\images\IMG_20180424_073829.jpg" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="Angle.test.ts" />
     <TypeScriptCompile Include="Angle.ts" />
-    <TypeScriptCompile Include="app.ts" />
     <TypeScriptCompile Include="Alerter.ts" />
     <TypeScriptCompile Include="CanvasClasses.ts" />
     <TypeScriptCompile Include="CanvasCopyPasteDemos.ts" />
@@ -125,6 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Tests\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
