@@ -7,9 +7,6 @@
         get radiansFromXPos(): number { return this.angle; }
         get degreesFromXPos(): number { return Angle.radiansToDegrees(this.angle); }
 
-        get radiansFromXNeg(): number { return -this.angle; }
-        get degreesFromXNeg(): number { return -Angle.radiansToDegrees(this.angle); }
-
         get radiansFromYNeg(): number { return -this.angle + Math.PI/2; }
         get degreesFromYNeg(): number { return Angle.radiansToDegrees(this.radiansFromYNeg); }
 
@@ -45,32 +42,10 @@
             return new Angle(angle1.angle + angle2.angle);
         }
 
-        public static fromRadiansFromXPos(radiansFromXPos: number) {
-            return new Angle(radiansFromXPos);
-        }
-
-        public static fromRadiansFromXNeg(radiansFromXNeg: number) {
-            return new Angle(-radiansFromXNeg);
-        }
-
         public static fromRadiansFromYNeg(radiansFromYNeg: number) {
             let radiansFromXPos = -radiansFromYNeg + Math.PI / 2;
             return new Angle(radiansFromXPos);
         }
-
-        public static fromDegreesFromXPos(degreesFromXPos: number) {
-            return new Angle(Angle.degreesToRadians(degreesFromXPos));
-        }
-
-        public static fromDegreesFromXNeg(degreesFromXNeg: number) {
-            return new Angle(-Angle.degreesToRadians(degreesFromXNeg));
-        }
-
-        public static fromDegreesFromYNeg(degreesFromYNeg: number) {
-            let radiansFromXPos = -Angle.radiansToDegrees(degreesFromYNeg) + Math.PI / 2;
-            return new Angle(radiansFromXPos);
-        }
-
 
         public static radiansToDegrees(radians: number): number {
             return radians / (2 * Math.PI) * 360;;
