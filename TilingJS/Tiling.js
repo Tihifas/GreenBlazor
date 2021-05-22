@@ -99,10 +99,7 @@ var TCanvasClasses;
             this.angle = angle;
             this.rotationPoint = rotationPoint;
         }
-        Rotation.fromRadiansFromYNeg = function (radians, rotationPoint) {
-            var angle = TMath.Angle.fromRadiansFromYNeg(radians);
-            return new Rotation(angle, rotationPoint);
-        };
+        //Just rotates ctx around roration point, does not draw anything
         Rotation.prototype.applyToCtx = function (ctx) {
             ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
             ctx.rotate(this.angle.radiansFromXNeg);
@@ -152,7 +149,7 @@ var TDemos;
             var angle = -Math.PI / 8 * i;
             var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromRadiansFromXPos(angle), rotationPointReal);
             var sourceRect = new TPosObjects.Rectangle(origin_1, canvasWidth / 2 - 2, canvasHeight - 2);
-            TDuplication.copyRectAndRotate(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
+            TDuplication.copyRotatePasteRect(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
         }
     }
     TDemos.CopyHexagonDemo = CopyHexagonDemo;
@@ -352,17 +349,28 @@ var ClipDrawer = /** @class */ (function () {
 }());
 var TDuplication;
 (function (TDuplication) {
-    function copyRectAndRotate(ctx, sourceRect, dx, dy, rotation) {
+    function copyRotatePasteRect(ctx, sourceRect, dx, dy, rotation) {
         rotation.applyToCtx(ctx);
         ctx.drawImage(ctx.canvas, sourceRect.left, sourceRect.top, sourceRect.width, sourceRect.height, dx, dy, sourceRect.width, sourceRect.height);
         ctx.resetTransform();
     }
-    TDuplication.copyRectAndRotate = copyRectAndRotate;
-    //export function CopyAndTransformRegion(region: Path2D, ctx: CanvasRenderingContext2D)
-    //export function rotateAroundPoint(angle: number, point: TMath.Vector, ctx: CanvasRenderingContext2D) {
-    //    let cosA = Math.cos(angle);
-    //    let sinA = Math.sin(angle);
-    //    ctx.setTransform(cosA, -sinA, sinA, cosA, point.x, point.y);
+    TDuplication.copyRotatePasteRect = copyRotatePasteRect;
+    function copyRotatePasteRegion(ctx, sSrcRegionOutline, rotation) {
+        //cut image
+        rotation.applyToCtx(ctx);
+        //paste cut image
+        ctx.resetTransform();
+    }
+    TDuplication.copyRotatePasteRegion = copyRotatePasteRegion;
+    //function crop() {
+    //    cw = canvas.width = img.width;
+    //    ch = canvas.height = img.height;
+    //    let path = TCanvasLib.polygonPath(new TMath.Vector(60, 3), 6, 200);
+    //    ctx.strokeStyle = 'black';
+    //    ctx.lineWidth = 6;
+    //    ctx.stroke(path);
+    //    ctx.clip(path);
+    //    ctx.drawImage(img, 0, 0);
     //}
 })(TDuplication || (TDuplication = {}));
 var TFactories;
@@ -772,7 +780,7 @@ var TSymmetries;
             }
             var rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
             for (var i = 1; i < this.period; i++) {
-                TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
+                TDuplication.copyRotatePasteRect(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
             if (drawSymmetryLines) {
                 this.drawSymmetryLines(ctx);

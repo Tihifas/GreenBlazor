@@ -37,7 +37,7 @@
             let rotation = new TCanvasClasses.Rotation(TMath.Angle.fromRadiansFromXPos(angle), rotationPointReal);
 
             let sourceRect = new TPosObjects.Rectangle(origin, canvasWidth/2-2, canvasHeight-2);
-            TDuplication.copyRectAndRotate(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
+            TDuplication.copyRotatePasteRect(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
         }
     }
 

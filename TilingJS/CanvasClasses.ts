@@ -7,11 +7,7 @@
             this.rotationPoint = rotationPoint;
         }
 
-        public static fromRadiansFromYNeg(radians, rotationPoint: TMath.Vector) {
-            let angle = TMath.Angle.fromRadiansFromYNeg(radians);
-            return new Rotation(angle, rotationPoint);
-        }
-
+        //Just rotates ctx around roration point, does not draw anything
         applyToCtx(ctx: CanvasRenderingContext2D) {
             ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
             ctx.rotate(this.angle.radiansFromXNeg);

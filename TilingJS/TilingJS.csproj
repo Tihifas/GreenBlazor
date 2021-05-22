@@ -81,7 +81,7 @@
   <ItemGroup>
     <Content Include="app.css" />
     <Content Include="index.html" />
-    <Content Include="Pages\GyrationDemo.html" />
+    <Content Include="Pages\IsleOfLegsDemo.html" />
     <Content Include="Pages\CanvasCopyPasteDemos.html" />
     <Content Include="Pages\PlotterDemos.html" />
     <Content Include="Pages\FactoryDemos.html" />

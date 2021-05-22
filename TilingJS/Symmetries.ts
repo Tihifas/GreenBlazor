@@ -21,7 +21,7 @@
             }
             let rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
             for (var i = 1; i < this.period; i++) {
-                TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
+                TDuplication.copyRotatePasteRect(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
 
             if (drawSymmetryLines) {
