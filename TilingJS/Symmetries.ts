@@ -7,7 +7,7 @@
         constructor(pos: TMath.Vector, period: number) {
             this.pos = pos;
             this.period = period;
-            this.angle = new TMath.Angle(2 * Math.PI / period);
+            this.angle = new TMath.Angle(-2 * Math.PI / period);
         }
 
         //If applyToRect not set then it applies to entire canvas
@@ -20,8 +20,7 @@
                 applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
             }
             let rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
-            //for (var i = 1; i <= this.period; i++) {
-            for (var i = 1; i <= 1; i++) { //TODO: undo, it should be period
+            for (var i = 1; i < this.period; i++) {
                 TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
 

@@ -1,11 +1,3 @@
-var Alerter = /** @class */ (function () {
-    function Alerter() {
-    }
-    Alerter.prototype.alert = function (message) {
-        alert(message);
-    };
-    return Alerter;
-}());
 var TMath;
 (function (TMath) {
     var Angle = /** @class */ (function () {
@@ -21,6 +13,16 @@ var TMath;
         });
         Object.defineProperty(Angle.prototype, "degreesFromXPos", {
             get: function () { return Angle.radiansToDegrees(this.angle); },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Angle.prototype, "radiansFromXNeg", {
+            get: function () { return -this.angle; },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(Angle.prototype, "degreesFromXNeg", {
+            get: function () { return -Angle.radiansToDegrees(this.angle); },
             enumerable: false,
             configurable: true
         });
@@ -59,8 +61,24 @@ var TMath;
         Angle.add = function (angle1, angle2) {
             return new Angle(angle1.angle + angle2.angle);
         };
+        Angle.fromRadiansFromXPos = function (radiansFromXPos) {
+            return new Angle(radiansFromXPos);
+        };
+        Angle.fromRadiansFromXNeg = function (radiansFromXNeg) {
+            return new Angle(-radiansFromXNeg);
+        };
         Angle.fromRadiansFromYNeg = function (radiansFromYNeg) {
             var radiansFromXPos = -radiansFromYNeg + Math.PI / 2;
+            return new Angle(radiansFromXPos);
+        };
+        Angle.fromDegreesFromXPos = function (degreesFromXPos) {
+            return new Angle(Angle.degreesToRadians(degreesFromXPos));
+        };
+        Angle.fromDegreesFromXNeg = function (degreesFromXNeg) {
+            return new Angle(-Angle.degreesToRadians(degreesFromXNeg));
+        };
+        Angle.fromDegreesFromYNeg = function (degreesFromYNeg) {
+            var radiansFromXPos = -Angle.radiansToDegrees(degreesFromYNeg) + Math.PI / 2;
             return new Angle(radiansFromXPos);
         };
         Angle.radiansToDegrees = function (radians) {
@@ -74,30 +92,6 @@ var TMath;
     }());
     TMath.Angle = Angle;
 })(TMath || (TMath = {}));
-var Greeter = /** @class */ (function () {
-    function Greeter(element) {
-        this.element = element;
-        this.element.innerHTML += "The time is: ";
-        this.span = document.createElement('span');
-        this.element.appendChild(this.span);
-        this.span.innerText = new Date().toUTCString();
-    }
-    Greeter.prototype.start = function () {
-        var _this = this;
-        this.timerToken = setInterval(function () { return _this.span.innerHTML = new Date().toUTCString(); }, 500);
-    };
-    Greeter.prototype.stop = function () {
-        clearTimeout(this.timerToken);
-    };
-    return Greeter;
-}());
-window.onload = function () {
-    //var el = document.getElementById('content');
-    //var greeter = new Greeter(el);
-    //greeter.start();
-    //var alerter = new Alerter();
-    //alerter.alert('ALERT');
-};
 var TCanvasClasses;
 (function (TCanvasClasses) {
     var Rotation = /** @class */ (function () {
@@ -111,7 +105,7 @@ var TCanvasClasses;
         };
         Rotation.prototype.applyToCtx = function (ctx) {
             ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
-            ctx.rotate(this.angle.radiansFromYNeg); //- because default is clockwise
+            ctx.rotate(this.angle.radiansFromXNeg);
             ctx.translate(-this.rotationPoint.x, -this.rotationPoint.y);
         };
         return Rotation;
@@ -155,8 +149,8 @@ var TDemos;
             //let toPoint =  new TMath.Vector(recSideL, 0);
             var toPoint = translationVector;
             var rotationPointReal = TMath.Vector.add(rotationPoint0, translationVector);
-            var angle = Math.PI / 8 * i;
-            var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromRadiansFromYNeg(angle), rotationPointReal);
+            var angle = -Math.PI / 8 * i;
+            var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromRadiansFromXPos(angle), rotationPointReal);
             var sourceRect = new TPosObjects.Rectangle(origin_1, canvasWidth / 2 - 2, canvasHeight - 2);
             TDuplication.copyRectAndRotate(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
         }
@@ -577,8 +571,6 @@ function imageGalleryDemo() {
     //        ctx.drawImage(img, 0, 0);
     //    }
 }
-function LoadAllFiles(path) {
-}
 var TPlotterDemos;
 (function (TPlotterDemos) {
     function mouseDemo() {
@@ -764,7 +756,7 @@ var TSymmetries;
         function GyrationPoint(pos, period) {
             this.pos = pos;
             this.period = period;
-            this.angle = new TMath.Angle(2 * Math.PI / period);
+            this.angle = new TMath.Angle(-2 * Math.PI / period);
         }
         //If applyToRect not set then it applies to entire canvas
         GyrationPoint.prototype.applyToCtx = function (ctx, applyToRect, drawSymmetryLines) {
@@ -779,8 +771,7 @@ var TSymmetries;
                 applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
             }
             var rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
-            //for (var i = 1; i <= this.period; i++) {
-            for (var i = 1; i <= 1; i++) { //TODO: undo, it should be period
+            for (var i = 1; i < this.period; i++) {
                 TDuplication.copyRectAndRotate(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
             }
             if (drawSymmetryLines) {
@@ -803,25 +794,43 @@ var TSymmetries;
 })(TSymmetries || (TSymmetries = {}));
 var TSymmetryDemos;
 (function (TSymmetryDemos) {
-    function gyrationDemo() {
+    function isleOfLegsDemo() {
+        var nCanvases = 8;
         var canvasW = 1200;
         var canvasH = 800;
-        var canvas = TCanvasTagCreation.MakeCanvas(20, 80, canvasW, canvasH, true);
-        var ctx = canvas.getContext("2d");
-        var center = new TMath.Vector(canvasW / 2, canvasH / 2);
-        var legPartsLength = 100;
-        var footLength = 50;
-        ctx.strokeStyle = 'black';
-        ctx.beginPath();
-        ctx.moveTo(center.x, center.y);
-        ctx.lineTo(center.x + legPartsLength, center.y);
-        ctx.lineTo(center.x + legPartsLength, center.y - legPartsLength);
-        ctx.lineTo(center.x + legPartsLength + footLength, center.y - legPartsLength);
-        ctx.stroke();
-        var gPoint = new TSymmetries.GyrationPoint(center, 3);
-        gPoint.applyToCtx(ctx, null, true);
+        var left = 20;
+        var top = 80;
+        var img = new Image();
+        //img.crossOrigin = 'anonymous';
+        //img.onload = crop;
+        img.src = "../wwwroot/images/IsleOfManLeg.png";
+        img.onload = function () {
+            var canvases = TCanvasTagCreation.MakeCanvasColumn(nCanvases, canvasH, canvasW, left, top);
+            for (var iCanvas = 0; iCanvas < nCanvases; iCanvas++) {
+                //let canvas = TCanvasTagCreation.MakeCanvas(20, 80, canvasW, canvasH, true);
+                var canvas = canvases[iCanvas];
+                var ctx = canvas.getContext("2d");
+                canvas.style.border = "1px solid black";
+                var center = new TMath.Vector(canvasW / 2, canvasH / 2);
+                var legPartsLength = 100;
+                var footLength = 50;
+                //ctx.fillStyle = 'rgba(208, 12, 39, 0.2)';
+                //ctx.fillStyle = 'red';
+                //ctx.fillRect(0, 0, canvasW, canvasH);
+                //ctx.strokeStyle = 'black';
+                //ctx.beginPath();
+                //ctx.moveTo(center.x, center.y);
+                //ctx.lineTo(center.x+legPartsLength, center.y);
+                //ctx.lineTo(center.x+legPartsLength, center.y-legPartsLength);
+                //ctx.lineTo(center.x+legPartsLength+footLength, center.y-legPartsLength);
+                //ctx.stroke();
+                ctx.drawImage(img, center.x, center.y - 180);
+                var gPoint = new TSymmetries.GyrationPoint(center, iCanvas + 1);
+                gPoint.applyToCtx(ctx, null, false);
+            }
+        };
     }
-    TSymmetryDemos.gyrationDemo = gyrationDemo;
+    TSymmetryDemos.isleOfLegsDemo = isleOfLegsDemo;
 })(TSymmetryDemos || (TSymmetryDemos = {}));
 var TCanvasTagCreation;
 (function (TCanvasTagCreation) {

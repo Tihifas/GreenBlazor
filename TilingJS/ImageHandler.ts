@@ -1,3 +1,0 @@
-﻿function LoadAllFiles(path: string) {
-    
-}

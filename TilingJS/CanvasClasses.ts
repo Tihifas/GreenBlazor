@@ -14,7 +14,7 @@
 
         applyToCtx(ctx: CanvasRenderingContext2D) {
             ctx.translate(this.rotationPoint.x, this.rotationPoint.y);
-            ctx.rotate(this.angle.radiansFromYNeg); //- because default is clockwise
+            ctx.rotate(this.angle.radiansFromXNeg);
             ctx.translate(-this.rotationPoint.x, -this.rotationPoint.y);
         }
     }

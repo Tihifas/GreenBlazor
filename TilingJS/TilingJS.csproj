@@ -96,11 +96,10 @@
     <Content Include="wwwroot\images\IMG_20180424_063643.jpg" />
     <Content Include="wwwroot\images\IMG_20180424_065134.jpg" />
     <Content Include="wwwroot\images\IMG_20180424_073829.jpg" />
+    <Content Include="wwwroot\images\IsleOfManLeg.png" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Angle.ts" />
-    <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="Alerter.ts" />
     <TypeScriptCompile Include="CanvasClasses.ts" />
     <TypeScriptCompile Include="CanvasCopyPasteDemos.ts" />
     <TypeScriptCompile Include="Symmetries.ts" />
@@ -112,7 +111,6 @@
     <TypeScriptCompile Include="ImageDemos.ts" />
     <TypeScriptCompile Include="PolygonDemo.ts" />
     <TypeScriptCompile Include="Draw.ts" />
-    <TypeScriptCompile Include="ImageHandler.ts" />
     <TypeScriptCompile Include="PlotterDemos.ts" />
     <TypeScriptCompile Include="Plotters.ts" />
     <TypeScriptCompile Include="PosObjects.ts" />
