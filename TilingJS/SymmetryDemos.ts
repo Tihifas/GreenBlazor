@@ -1,6 +1,6 @@
 ﻿namespace TSymmetryDemos {
     export function isleOfLegsDemo() {
-        let nCanvases = 8;
+        let nCanvases = 5;
         let canvasW = 1200;
         let canvasH = 800;
         let left = 20;
@@ -25,9 +25,9 @@
                 let legPartsLength = 100;
                 let footLength = 50;
 
-                //ctx.fillStyle = 'rgba(208, 12, 39, 0.2)';
+                ctx.fillStyle = 'rgba(207, 20, 43, 1)';
                 //ctx.fillStyle = 'red';
-                //ctx.fillRect(0, 0, canvasW, canvasH);
+                ctx.fillRect(0, 0, canvasW, canvasH);
 
                 //ctx.strokeStyle = 'black';
                 //ctx.beginPath();
@@ -38,9 +38,12 @@
                 //ctx.stroke();
 
 
-                ctx.drawImage(img, center.x, center.y - 180);
-                let gPoint = new TSymmetries.GyrationPoint(center, iCanvas + 1);
-                gPoint.applyToCtx(ctx, null, false);
+                let rotation = new TCanvasClasses.Rotation(TMath.Angle.fromDegreesFromXPos(5), center.copyAddXY(90, -90));
+                TCanvasLib.drawImage(ctx, img, center.copyAddXY(-10, -169), rotation);
+                //ctx.drawImage(img, center.x, center.y - 180);
+
+                let gPoint = new TSymmetries.GyrationPoint(center, iCanvas+3);
+                gPoint.applyToCtx(ctx, 260, false, false);
             }
         }
     }

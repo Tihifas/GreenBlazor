@@ -11,22 +11,30 @@
         }
 
         //If applyToRect not set then it applies to entire canvas
-        public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null, drawSymmetryLines = false) {
+        //public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null, drawSymmetryLines = false) {
+        public applyToCtx(ctx: CanvasRenderingContext2D, radius: number = null, drawSymmetryLines = false, drawSrcRegion = false) {
                 let canvasUpperLeft = new TMath.Vector(0, 0);
-            if (applyToRect != null) throw new Error("applyToRect != null not implented");
-            else {
-                let width = ctx.canvas.width;
-                let height = ctx.canvas.height;
-                applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
-            }
-            let rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
+            if (radius == null) throw new Error("radius == null not implented");
+            //if (applyToRect != null) throw new Error("applyToRect != null not implented");
+            //else {
+            //    let width = ctx.canvas.width;
+            //    let height = ctx.canvas.height;
+            //    applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
+            //}
+
+            let angle1 = TMath.Angle.fromRadiansFromYNeg(-this.angle.radiansFromXPos);
+            let angle2 = TMath.Angle.fromRadiansFromYNeg(0);
+            let cakeSlicePath = TCanvasLib.cakeSlicePath(this.pos, radius, angle1, angle2);
+
             for (var i = 1; i < this.period; i++) {
-                TDuplication.copyRotatePasteRect(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
+                let angleI = new TMath.Angle(this.angle.angle * i);
+                let rotation = new TCanvasClasses.Rotation(angleI, this.pos);
+
+                TDuplication.copyRotatePasteRegion(ctx, cakeSlicePath, rotation);
             }
 
-            if (drawSymmetryLines) {
-                this.drawSymmetryLines(ctx);
-            }
+            if (drawSrcRegion) ctx.stroke(cakeSlicePath);   
+            if (drawSymmetryLines) this.drawSymmetryLines(ctx);
         }
 
         public drawSymmetryLines(ctx: CanvasRenderingContext2D, lineL: number = null) {

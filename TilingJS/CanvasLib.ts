@@ -70,13 +70,13 @@
         return polygonPath(pos0, nSides, cDiameter, angle0Override);
     }
 
-    export function polygonPath(pos0: TMath.Vector, nSides: number, cDiameter: number, angle0Override = null) {
+    export function polygonPath(pos0: TMath.Vector, nSides: number, cDiameter: number, angle0Override: TMath.Angle = null) {
         let sideL = cDiameter * Math.sin(Math.PI / nSides);
         let turtle = new PathTurtle(pos0);
-        let innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
+        let innerAngle = TMath.Angle.fromRadiansFromXPos(Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides);
 
         if (angle0Override === null) {
-            turtle.rotate(innerAngle / 2); //default Rotated because hexagonal packing is easier
+            turtle.rotate(innerAngle.copy().scale(0.5)); //default Rotated because hexagonal packing is easier
         }
         else {
             turtle.rotate(angle0Override);
@@ -89,15 +89,48 @@
         return turtle.getPath();
     }
 
+    export function drawImage(ctx: CanvasRenderingContext2D, img: CanvasImageSource, pos: TMath.Vector, rotation: TCanvasClasses.Rotation = null) {
+        if (rotation == null) {
+            ctx.drawImage(img, pos.x, pos.y);
+        }
+        else {
+            ctx.save();
+            rotation.applyToCtx(ctx);
+            ctx.drawImage(img, pos.x, pos.y);
+            ctx.restore();
+        }
+    }
+
+    export function cakeSlicePath(center: TMath.Vector, radius: number, angle1: TMath.Angle, angle2: TMath.Angle)
+        : Path2D
+    {
+        let path = new Path2D();
+        path.moveTo(center.x, center.y);
+
+        let toAngle1 = TMath.Vector.fromPolar(radius, angle1).yNegCopy();
+        let atAngle1 = TMath.Vector.add(center, toAngle1);
+        path.lineTo(atAngle1.x, atAngle1.y);
+
+        path.arc(center.x, center.y, radius, angle1.radiansFromXNeg, angle2.radiansFromXNeg, true);
+
+        let toAngle2 = TMath.Vector.fromPolar(radius, angle2).yNegCopy();
+        let atAngle2 = TMath.Vector.add(center, toAngle2);
+        path.moveTo(atAngle2.x, atAngle2.y); //Obs move to, not line to.
+
+        path.lineTo(center.x, center.y);
+
+        return path;
+    }
+
     export class PathTurtle {
         private pos: TMath.Vector;
-        private rotation: number; //radians
+        private rotation: TMath.Angle;
         private path: Path2D;
 
         constructor(pos0: TMath.Vector, rotation = 0) {
             this.path = new Path2D();
             this.pos = pos0;
-            this.rotation = rotation;
+            this.rotation = new TMath.Angle(rotation);
 
             this.path.moveTo(this.pos.x, this.pos.y);
         }
@@ -111,14 +144,14 @@
         }
 
         move(length: number) {
-            let dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
+            let dPos = TMath.Vector.fromPolar(length, this.rotation);
             this.pos.add(dPos);
             this.lineToPos();
         }
 
         //radians
-        rotate(angle: number) {
-            this.rotation += angle;
+        rotate(angle: TMath.Angle) {
+            this.rotation.add(angle);
         }
     }
 

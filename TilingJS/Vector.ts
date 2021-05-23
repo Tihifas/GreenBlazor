@@ -24,6 +24,10 @@
             return new Vector(this.x, this.y);
         }
 
+        public yNegCopy(): Vector {
+            return new Vector(this.x, -this.y);
+        }
+
         public static fromRotationAndLength(rotation: number, lenght = 1) {
             let x = Math.cos(rotation) * lenght;
             let y = Math.sin(rotation) * lenght;
@@ -45,6 +49,10 @@
         public add(vOther: Vector) {
             this.x += vOther.x;
             this.y += vOther.y;
+        }
+
+        public copyAddXY(dx: number, dy: number) {
+            return new Vector(this.x+dx, this.y+dy);
         }
 
         public static subtract(v1: Vector, v2: Vector) {

@@ -7,10 +7,14 @@
     }
 
     export function copyRotatePasteRegion(ctx: CanvasRenderingContext2D, srcRegionOutline: Path2D, rotation: TCanvasClasses.Rotation) {
-        //cut image
+        ctx.save();
+
         rotation.applyToCtx(ctx);
-        //paste cut image
+        ctx.clip(srcRegionOutline);
+        ctx.drawImage(ctx.canvas, 0, 0);
+
         ctx.resetTransform();
+        ctx.restore();
     }
 
     //function crop() {

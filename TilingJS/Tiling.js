@@ -240,9 +240,9 @@ var TCanvasLib;
         if (angle0Override === void 0) { angle0Override = null; }
         var sideL = cDiameter * Math.sin(Math.PI / nSides);
         var turtle = new PathTurtle(pos0);
-        var innerAngle = Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides;
+        var innerAngle = TMath.Angle.fromRadiansFromXPos(Math.PI - (Math.PI * (nSides - 2) + 0.0) / nSides);
         if (angle0Override === null) {
-            turtle.rotate(innerAngle / 2); //default Rotated because hexagonal packing is easier
+            turtle.rotate(innerAngle.copy().scale(0.5)); //default Rotated because hexagonal packing is easier
         }
         else {
             turtle.rotate(angle0Override);
@@ -254,12 +254,39 @@ var TCanvasLib;
         return turtle.getPath();
     }
     TCanvasLib.polygonPath = polygonPath;
+    function drawImage(ctx, img, pos, rotation) {
+        if (rotation === void 0) { rotation = null; }
+        if (rotation == null) {
+            ctx.drawImage(img, pos.x, pos.y);
+        }
+        else {
+            ctx.save();
+            rotation.applyToCtx(ctx);
+            ctx.drawImage(img, pos.x, pos.y);
+            ctx.restore();
+        }
+    }
+    TCanvasLib.drawImage = drawImage;
+    function cakeSlicePath(center, radius, angle1, angle2) {
+        var path = new Path2D();
+        path.moveTo(center.x, center.y);
+        var toAngle1 = TMath.Vector.fromPolar(radius, angle1).yNegCopy();
+        var atAngle1 = TMath.Vector.add(center, toAngle1);
+        path.lineTo(atAngle1.x, atAngle1.y);
+        path.arc(center.x, center.y, radius, angle1.radiansFromXNeg, angle2.radiansFromXNeg, true);
+        var toAngle2 = TMath.Vector.fromPolar(radius, angle2).yNegCopy();
+        var atAngle2 = TMath.Vector.add(center, toAngle2);
+        path.moveTo(atAngle2.x, atAngle2.y); //Obs move to, not line to.
+        path.lineTo(center.x, center.y);
+        return path;
+    }
+    TCanvasLib.cakeSlicePath = cakeSlicePath;
     var PathTurtle = /** @class */ (function () {
         function PathTurtle(pos0, rotation) {
             if (rotation === void 0) { rotation = 0; }
             this.path = new Path2D();
             this.pos = pos0;
-            this.rotation = rotation;
+            this.rotation = new TMath.Angle(rotation);
             this.path.moveTo(this.pos.x, this.pos.y);
         }
         PathTurtle.prototype.getPath = function () {
@@ -269,13 +296,13 @@ var TCanvasLib;
             this.path.lineTo(this.pos.x, this.pos.y);
         };
         PathTurtle.prototype.move = function (length) {
-            var dPos = TMath.Vector.fromRotationAndLength(this.rotation, length);
+            var dPos = TMath.Vector.fromPolar(length, this.rotation);
             this.pos.add(dPos);
             this.lineToPos();
         };
         //radians
         PathTurtle.prototype.rotate = function (angle) {
-            this.rotation += angle;
+            this.rotation.add(angle);
         };
         return PathTurtle;
     }());
@@ -355,11 +382,13 @@ var TDuplication;
         ctx.resetTransform();
     }
     TDuplication.copyRotatePasteRect = copyRotatePasteRect;
-    function copyRotatePasteRegion(ctx, sSrcRegionOutline, rotation) {
-        //cut image
+    function copyRotatePasteRegion(ctx, srcRegionOutline, rotation) {
+        ctx.save();
         rotation.applyToCtx(ctx);
-        //paste cut image
+        ctx.clip(srcRegionOutline);
+        ctx.drawImage(ctx.canvas, 0, 0);
         ctx.resetTransform();
+        ctx.restore();
     }
     TDuplication.copyRotatePasteRegion = copyRotatePasteRegion;
     //function crop() {
@@ -767,24 +796,32 @@ var TSymmetries;
             this.angle = new TMath.Angle(-2 * Math.PI / period);
         }
         //If applyToRect not set then it applies to entire canvas
-        GyrationPoint.prototype.applyToCtx = function (ctx, applyToRect, drawSymmetryLines) {
-            if (applyToRect === void 0) { applyToRect = null; }
+        //public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null, drawSymmetryLines = false) {
+        GyrationPoint.prototype.applyToCtx = function (ctx, radius, drawSymmetryLines, drawSrcRegion) {
+            if (radius === void 0) { radius = null; }
             if (drawSymmetryLines === void 0) { drawSymmetryLines = false; }
+            if (drawSrcRegion === void 0) { drawSrcRegion = false; }
             var canvasUpperLeft = new TMath.Vector(0, 0);
-            if (applyToRect != null)
-                throw new Error("applyToRect != null not implented");
-            else {
-                var width = ctx.canvas.width;
-                var height = ctx.canvas.height;
-                applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
-            }
-            var rotation = new TCanvasClasses.Rotation(this.angle, this.pos);
+            if (radius == null)
+                throw new Error("radius == null not implented");
+            //if (applyToRect != null) throw new Error("applyToRect != null not implented");
+            //else {
+            //    let width = ctx.canvas.width;
+            //    let height = ctx.canvas.height;
+            //    applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
+            //}
+            var angle1 = TMath.Angle.fromRadiansFromYNeg(-this.angle.radiansFromXPos);
+            var angle2 = TMath.Angle.fromRadiansFromYNeg(0);
+            var cakeSlicePath = TCanvasLib.cakeSlicePath(this.pos, radius, angle1, angle2);
             for (var i = 1; i < this.period; i++) {
-                TDuplication.copyRotatePasteRect(ctx, applyToRect, canvasUpperLeft.x, canvasUpperLeft.y, rotation);
+                var angleI = new TMath.Angle(this.angle.angle * i);
+                var rotation = new TCanvasClasses.Rotation(angleI, this.pos);
+                TDuplication.copyRotatePasteRegion(ctx, cakeSlicePath, rotation);
             }
-            if (drawSymmetryLines) {
+            if (drawSrcRegion)
+                ctx.stroke(cakeSlicePath);
+            if (drawSymmetryLines)
                 this.drawSymmetryLines(ctx);
-            }
         };
         GyrationPoint.prototype.drawSymmetryLines = function (ctx, lineL) {
             if (lineL === void 0) { lineL = null; }
@@ -803,7 +840,7 @@ var TSymmetries;
 var TSymmetryDemos;
 (function (TSymmetryDemos) {
     function isleOfLegsDemo() {
-        var nCanvases = 8;
+        var nCanvases = 5;
         var canvasW = 1200;
         var canvasH = 800;
         var left = 20;
@@ -822,9 +859,9 @@ var TSymmetryDemos;
                 var center = new TMath.Vector(canvasW / 2, canvasH / 2);
                 var legPartsLength = 100;
                 var footLength = 50;
-                //ctx.fillStyle = 'rgba(208, 12, 39, 0.2)';
+                ctx.fillStyle = 'rgba(207, 20, 43, 1)';
                 //ctx.fillStyle = 'red';
-                //ctx.fillRect(0, 0, canvasW, canvasH);
+                ctx.fillRect(0, 0, canvasW, canvasH);
                 //ctx.strokeStyle = 'black';
                 //ctx.beginPath();
                 //ctx.moveTo(center.x, center.y);
@@ -832,9 +869,11 @@ var TSymmetryDemos;
                 //ctx.lineTo(center.x+legPartsLength, center.y-legPartsLength);
                 //ctx.lineTo(center.x+legPartsLength+footLength, center.y-legPartsLength);
                 //ctx.stroke();
-                ctx.drawImage(img, center.x, center.y - 180);
-                var gPoint = new TSymmetries.GyrationPoint(center, iCanvas + 1);
-                gPoint.applyToCtx(ctx, null, false);
+                var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromDegreesFromXPos(5), center.copyAddXY(90, -90));
+                TCanvasLib.drawImage(ctx, img, center.copyAddXY(-10, -169), rotation);
+                //ctx.drawImage(img, center.x, center.y - 180);
+                var gPoint = new TSymmetries.GyrationPoint(center, iCanvas + 3);
+                gPoint.applyToCtx(ctx, 260, false, false);
             }
         };
     }
@@ -913,6 +952,9 @@ var TMath;
         Vector.prototype.copy = function () {
             return new Vector(this.x, this.y);
         };
+        Vector.prototype.yNegCopy = function () {
+            return new Vector(this.x, -this.y);
+        };
         Vector.fromRotationAndLength = function (rotation, lenght) {
             if (lenght === void 0) { lenght = 1; }
             var x = Math.cos(rotation) * lenght;
@@ -931,6 +973,9 @@ var TMath;
         Vector.prototype.add = function (vOther) {
             this.x += vOther.x;
             this.y += vOther.y;
+        };
+        Vector.prototype.copyAddXY = function (dx, dy) {
+            return new Vector(this.x + dx, this.y + dy);
         };
         Vector.subtract = function (v1, v2) {
             return new Vector(v1.x - v2.x, v1.y - v2.y);
