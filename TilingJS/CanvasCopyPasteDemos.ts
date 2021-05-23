@@ -12,7 +12,7 @@
             let canvas = canvases[i];
             let ctx = canvas.getContext("2d");
 
-            let origin = new TMath.Vector(0,0);
+            let origin = new TMath.Vector(0, 0);
 
 
             ctx.fillRect(canvasWidth / 2, 0, 2, canvasHeight);
@@ -27,7 +27,7 @@
 
             let recSideL = canvasWidth / 2;
             //let translationVector = new TMath.Vector(0, 0);
-            let translationVector = new TMath.Vector(canvasWidth/2, 0);
+            let translationVector = new TMath.Vector(canvasWidth / 2, 0);
             //let toPoint =  new TMath.Vector(recSideL, 0);
             let toPoint = translationVector
 
@@ -36,7 +36,7 @@
 
             let rotation = new TCanvasClasses.Rotation(TMath.Angle.fromRadiansFromXPos(angle), rotationPointReal);
 
-            let sourceRect = new TPosObjects.Rectangle(origin, canvasWidth/2-2, canvasHeight-2);
+            let sourceRect = new TPosObjects.Rectangle(origin, canvasWidth / 2 - 2, canvasHeight - 2);
             TDuplication.copyRotatePasteRect(ctx, sourceRect, toPoint.x, toPoint.y, rotation);
         }
     }
@@ -46,8 +46,8 @@
         let arrowLength = canvasHeight / 4;
 
         let arrowPointSideL = 10;
-        let arrowTip = new TMath.Vector(arrowCenter.x, arrowCenter.y - arrowLength/2 - arrowPointSideL);
-        ctx.fillRect(arrowCenter.x - arrowWidth / 4, arrowCenter.y - arrowLength/2, arrowPointSideL, arrowLength);
+        let arrowTip = new TMath.Vector(arrowCenter.x, arrowCenter.y - arrowLength / 2 - arrowPointSideL);
+        ctx.fillRect(arrowCenter.x - arrowWidth / 4, arrowCenter.y - arrowLength / 2, arrowPointSideL, arrowLength);
         TCanvasLib.fillPolygonBySideL(arrowTip, 4, 20, ctx);
 
         return arrowTip;

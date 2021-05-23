@@ -608,6 +608,17 @@ function imageGalleryDemo() {
     //        ctx.drawImage(img, 0, 0);
     //    }
 }
+///// <reference path ="node_modules\@types\jquery\JQuery.d.ts"/>
+//import $ from "jquery";
+//import $ = require("jquery");
+var TJqueryExperiments;
+(function (TJqueryExperiments) {
+    function jquery1() {
+        var h1 = $('h1');
+        h1.css('color', 'red');
+    }
+    TJqueryExperiments.jquery1 = jquery1;
+})(TJqueryExperiments || (TJqueryExperiments = {}));
 var TPlotterDemos;
 (function (TPlotterDemos) {
     function mouseDemo() {
@@ -878,6 +889,36 @@ var TSymmetryDemos;
         };
     }
     TSymmetryDemos.isleOfLegsDemo = isleOfLegsDemo;
+    function gyrationDemo() {
+        var nCanvases = 5;
+        var canvasW = 1200;
+        var canvasH = 800;
+        var left = 20;
+        var top = 80;
+        var img = new Image();
+        img.src = "../wwwroot/images/IsleOfManLeg.png";
+        img.onload = function () {
+            var canvases = TCanvasTagCreation.MakeCanvasColumn(nCanvases, canvasH, canvasW, left, top);
+            for (var iCanvas = 0; iCanvas < nCanvases; iCanvas++) {
+                //let canvas = TCanvasTagCreation.MakeCanvas(20, 80, canvasW, canvasH, true);
+                var canvas = canvases[iCanvas];
+                var ctx = canvas.getContext("2d");
+                canvas.style.border = "1px solid black";
+                var center = new TMath.Vector(canvasW / 2, canvasH / 2);
+                var legPartsLength = 100;
+                var footLength = 50;
+                ctx.fillStyle = 'rgba(207, 20, 43, 1)';
+                //ctx.fillStyle = 'red';
+                ctx.fillRect(0, 0, canvasW, canvasH);
+                var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromDegreesFromXPos(5), center.copyAddXY(90, -90));
+                TCanvasLib.drawImage(ctx, img, center.copyAddXY(-10, -169), rotation);
+                //ctx.drawImage(img, center.x, center.y - 180);
+                var gPoint = new TSymmetries.GyrationPoint(center, iCanvas + 3);
+                gPoint.applyToCtx(ctx, 260, false, false);
+            }
+        };
+    }
+    TSymmetryDemos.gyrationDemo = gyrationDemo;
 })(TSymmetryDemos || (TSymmetryDemos = {}));
 var TCanvasTagCreation;
 (function (TCanvasTagCreation) {
