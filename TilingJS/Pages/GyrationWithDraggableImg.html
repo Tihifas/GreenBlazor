@@ -8,10 +8,17 @@
     <link href="../wwwroot/thirdParty/jquery-ui/jquery-ui.theme.css" rel="stylesheet" />
 
     <style>
-        .blue-rect {
-            width: 50px;
-            height: 50px;
-            background-color: blue;
+        #img-input {
+            position: absolute;
+            left: 600px;
+            top: 100px;
+            height: 300px;
+        }
+
+        h1{
+            position: absolute;
+            left: 20px;
+            top: -10px;
         }
     </style>
 
@@ -21,28 +28,15 @@
 </head>
 <body>
     <h1>jquery experiments</h1>
-
-    <div id="br-0" class="blue-rect"> blue rect 0</div>
-    <br />
-    <div id="br-x" class="blue-rect"> x </div>
-    <br />
-    <div id="br-y"class="blue-rect"> y </div>
-    <br />
-    <div id="br-hl"class="blue-rect"> highlight </div>
-
-    <!--<canvas style="width: 1000px; height: 1000px;"></canvas>-->
+    <img id="img-input" src="../wwwroot/images/CVBilledeDecLysCropped.jpg" />
 </body>
 </html>
 
 <script>
     window.onload = () => {
-        $("#br-0").draggable();
-        $("#br-x").draggable({ axis: "x" });
-        $("#br-y").draggable({ axis: "y"});
-        $("#br-hl").draggable({
-            classes: {
-                "ui-draggable": "highlight"
-            }
-        });
+        let imgJQ = $("#img-input");
+        let img = imgJQ[0];
+
+        TSymmetryDemos.gyrationDraggableImgDemo(img);
     };
 </script>

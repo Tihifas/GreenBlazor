@@ -267,6 +267,14 @@ var TCanvasLib;
         }
     }
     TCanvasLib.drawImage = drawImage;
+    function drawImgOnCanvasAsIs(ctx, img) {
+        ctx.save();
+        var dx = img.offsetLeft - ctx.canvas.offsetLeft;
+        var dy = img.offsetTop - ctx.canvas.offsetTop;
+        ctx.drawImage(img, dx, dy, img.width, img.height);
+        ctx.restore();
+    }
+    TCanvasLib.drawImgOnCanvasAsIs = drawImgOnCanvasAsIs;
     function cakeSlicePath(center, radius, angle1, angle2) {
         var path = new Path2D();
         path.moveTo(center.x, center.y);
@@ -608,17 +616,6 @@ function imageGalleryDemo() {
     //        ctx.drawImage(img, 0, 0);
     //    }
 }
-///// <reference path ="node_modules\@types\jquery\JQuery.d.ts"/>
-//import $ from "jquery";
-//import $ = require("jquery");
-var TJqueryExperiments;
-(function (TJqueryExperiments) {
-    function jquery1() {
-        var h1 = $('h1');
-        h1.css('color', 'red');
-    }
-    TJqueryExperiments.jquery1 = jquery1;
-})(TJqueryExperiments || (TJqueryExperiments = {}));
 var TPlotterDemos;
 (function (TPlotterDemos) {
     function mouseDemo() {
@@ -889,79 +886,35 @@ var TSymmetryDemos;
         };
     }
     TSymmetryDemos.isleOfLegsDemo = isleOfLegsDemo;
-    function gyrationDemo() {
-        var nCanvases = 5;
+    function gyrationDraggableImgDemo(img) {
+        var imgJQ = $(img);
         var canvasW = 1200;
-        var canvasH = 800;
-        var left = 20;
-        var top = 80;
-        var img = new Image();
-        img.src = "../wwwroot/images/IsleOfManLeg.png";
-        img.onload = function () {
-            var canvases = TCanvasTagCreation.MakeCanvasColumn(nCanvases, canvasH, canvasW, left, top);
-            for (var iCanvas = 0; iCanvas < nCanvases; iCanvas++) {
-                //let canvas = TCanvasTagCreation.MakeCanvas(20, 80, canvasW, canvasH, true);
-                var canvas = canvases[iCanvas];
-                var ctx = canvas.getContext("2d");
-                canvas.style.border = "1px solid black";
-                var center = new TMath.Vector(canvasW / 2, canvasH / 2);
-                var legPartsLength = 100;
-                var footLength = 50;
-                ctx.fillStyle = 'rgba(207, 20, 43, 1)';
-                //ctx.fillStyle = 'red';
-                ctx.fillRect(0, 0, canvasW, canvasH);
-                var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromDegreesFromXPos(5), center.copyAddXY(90, -90));
-                TCanvasLib.drawImage(ctx, img, center.copyAddXY(-10, -169), rotation);
-                //ctx.drawImage(img, center.x, center.y - 180);
-                var gPoint = new TSymmetries.GyrationPoint(center, iCanvas + 3);
-                gPoint.applyToCtx(ctx, 260, false, false);
+        var canvasH = 660;
+        var center = new TMath.Vector(canvasW / 2, canvasH / 2);
+        //var img = new Image();
+        //img.src = "../wwwroot/images/CVBilledeDecLysCropped.jpg";
+        //var img = document.getElementById('img-input');
+        //img.onload = () => {
+        var canvas = TCanvasTagCreation.MakeCanvas(10, 10, canvasW, canvasH, true);
+        var ctx = canvas.getContext("2d");
+        TCanvasLib.drawImgOnCanvasAsIs(ctx, img);
+        var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromDegreesFromXPos(5), center.copyAddXY(90, -90));
+        var gPoint = new TSymmetries.GyrationPoint(center, 6);
+        imgJQ.draggable({
+            drag: function (event, ui) {
+                img.style.visibility = 'hidden';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                TCanvasLib.drawImgOnCanvasAsIs(ctx, img);
+                gPoint.applyToCtx(ctx, 1000, false, false);
             }
-        };
+        });
+        imgJQ.on("dragstop", function (event, ui) {
+            //img.style.visibility = 'visible';
+        });
+        //}
     }
-    TSymmetryDemos.gyrationDemo = gyrationDemo;
+    TSymmetryDemos.gyrationDraggableImgDemo = gyrationDraggableImgDemo;
 })(TSymmetryDemos || (TSymmetryDemos = {}));
-var TCanvasTagCreation;
-(function (TCanvasTagCreation) {
-    function MakeCanvas(x, y, width, height, drawBorder, parentElmnt, fixCanvasDpi) {
-        if (drawBorder === void 0) { drawBorder = false; }
-        if (parentElmnt === void 0) { parentElmnt = null; }
-        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
-        if (parentElmnt == null) {
-            parentElmnt = document.body;
-        }
-        var canvas = document.createElement("canvas");
-        if (fixCanvasDpi)
-            TCanvasLib.fixCanvasDpi(canvas);
-        canvas.style.position = "absolute";
-        canvas.style.left = x + 'px';
-        canvas.style.top = y + 'px';
-        canvas.width = width; //important to set canvas.width/height, not just canvas.style.width!
-        canvas.height = height;
-        parentElmnt.appendChild(canvas);
-        if (drawBorder)
-            canvas.style.border = "1px solid black";
-        return canvas;
-    }
-    TCanvasTagCreation.MakeCanvas = MakeCanvas;
-    function MakeCanvasColumn(n, heightOfOne, width, x, y, parentElmnt, fixCanvasDpi) {
-        if (width === void 0) { width = null; }
-        if (x === void 0) { x = 0; }
-        if (y === void 0) { y = 0; }
-        if (parentElmnt === void 0) { parentElmnt = null; }
-        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
-        if (width === null)
-            throw new Error("notimplemented"); //TODO screen/parent width
-        var yCurrent = y;
-        var canvases = new Array(n);
-        for (var i = 0; i < n; i++) {
-            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, false, parentElmnt, fixCanvasDpi);
-            yCurrent += heightOfOne;
-            canvases[i] = canvas;
-        }
-        return canvases;
-    }
-    TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
-})(TCanvasTagCreation || (TCanvasTagCreation = {}));
 var TMath;
 (function (TMath) {
     function logisticFunction(x, maxValue, x0, growthRate) {
@@ -1040,4 +993,48 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
+var TCanvasTagCreation;
+(function (TCanvasTagCreation) {
+    function MakeCanvas(x, y, width, height, drawBorder, parentElmnt, fixCanvasDpi, zIndex) {
+        if (drawBorder === void 0) { drawBorder = false; }
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (zIndex === void 0) { zIndex = -1; }
+        if (parentElmnt == null) {
+            parentElmnt = document.body;
+        }
+        var canvas = document.createElement("canvas");
+        canvas.style.zIndex = zIndex.toString();
+        if (fixCanvasDpi)
+            TCanvasLib.fixCanvasDpi(canvas);
+        canvas.style.position = "absolute";
+        canvas.style.left = x + 'px';
+        canvas.style.top = y + 'px';
+        canvas.width = width; //important to set canvas.width/height, not just canvas.style.width!
+        canvas.height = height;
+        parentElmnt.appendChild(canvas);
+        if (drawBorder)
+            canvas.style.border = "1px solid black";
+        return canvas;
+    }
+    TCanvasTagCreation.MakeCanvas = MakeCanvas;
+    function MakeCanvasColumn(n, heightOfOne, width, x, y, parentElmnt, fixCanvasDpi) {
+        if (width === void 0) { width = null; }
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (width === null)
+            throw new Error("notimplemented"); //TODO screen/parent width
+        var yCurrent = y;
+        var canvases = new Array(n);
+        for (var i = 0; i < n; i++) {
+            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, false, parentElmnt, fixCanvasDpi);
+            yCurrent += heightOfOne;
+            canvases[i] = canvas;
+        }
+        return canvases;
+    }
+    TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
+})(TCanvasTagCreation || (TCanvasTagCreation = {}));
 //# sourceMappingURL=Tiling.js.map

@@ -83,13 +83,34 @@
     <Content Include="node_modules\jquery\external\sizzle\dist\sizzle.min.map" />
     <Content Include="node_modules\jquery\package.json" />
     <Content Include="node_modules\jquery\README.md" />
+    <Content Include="Pages\GyrationWithDraggableImg.html" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\AUTHORS.txt" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\external\jquery\jquery.js" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\images\ui-icons_444444_256x240.png" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\images\ui-icons_555555_256x240.png" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\images\ui-icons_777620_256x240.png" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\images\ui-icons_777777_256x240.png" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\index.html" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.css" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.js" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.min.css" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.min.js" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.structure.css" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.structure.min.css" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.theme.css" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\jquery-ui.theme.min.css" />
+    <Content Include="wwwroot\thirdParty\jquery-ui\LICENSE.txt" />
     <Content Include="wwwroot\thirdParty\jquery.min.js" />
+    <Content Include="wwwroot\thirdParty\jquery\jquery.min.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
+    <Content Include="wwwroot\thirdParty\jquery-ui\package.json" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.css" />
@@ -234,7 +255,6 @@
     <TypeScriptCompile Include="Angle.ts" />
     <TypeScriptCompile Include="CanvasClasses.ts" />
     <TypeScriptCompile Include="CanvasCopyPasteDemos.ts" />
-    <TypeScriptCompile Include="jQueryExperiments.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\dist\jquery.slim.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\index.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\JQuery.d.ts" />
@@ -244,7 +264,7 @@
     <TypeScriptCompile Include="node_modules\%40types\sizzle\index.d.ts" />
     <TypeScriptCompile Include="Symmetries.ts" />
     <TypeScriptCompile Include="SymmetryDemos.ts" />
-    <TypeScriptCompile Include="TCanvasTagCreation.ts" />
+    <TypeScriptCompile Include="CanvasTagCreation.ts" />
     <TypeScriptCompile Include="Duplication.ts" />
     <TypeScriptCompile Include="Factories.ts" />
     <TypeScriptCompile Include="FactoryDemos.ts" />

@@ -101,9 +101,17 @@
         }
     }
 
+    export function drawImgOnCanvasAsIs(ctx: CanvasRenderingContext2D, img: HTMLImageElement) {
+        ctx.save();
+
+        let dx = img.offsetLeft - ctx.canvas.offsetLeft;
+        let dy = img.offsetTop - ctx.canvas.offsetTop;
+        ctx.drawImage(img, dx, dy, img.width, img.height);
+        ctx.restore();
+    }
+
     export function cakeSlicePath(center: TMath.Vector, radius: number, angle1: TMath.Angle, angle2: TMath.Angle)
-        : Path2D
-    {
+        : Path2D {
         let path = new Path2D();
         path.moveTo(center.x, center.y);
 

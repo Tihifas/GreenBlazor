@@ -1,12 +1,14 @@
 ﻿namespace TCanvasTagCreation {
     export function MakeCanvas(x: number, y: number, width: number, height: number,
                                 drawBorder: boolean = false, parentElmnt: HTMLElement = null,
-                                fixCanvasDpi: boolean = true): HTMLCanvasElement {
+                                fixCanvasDpi: boolean = true,
+                                zIndex: number = -1): HTMLCanvasElement {
         if (parentElmnt == null) {
             parentElmnt = document.body;
         }
 
         let canvas = document.createElement("canvas");
+        canvas.style.zIndex = zIndex.toString();
         if (fixCanvasDpi) TCanvasLib.fixCanvasDpi(canvas);
 
         canvas.style.position = "absolute";
