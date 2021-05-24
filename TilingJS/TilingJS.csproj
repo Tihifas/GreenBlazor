@@ -255,6 +255,7 @@
     <TypeScriptCompile Include="Angle.ts" />
     <TypeScriptCompile Include="CanvasClasses.ts" />
     <TypeScriptCompile Include="CanvasCopyPasteDemos.ts" />
+    <TypeScriptCompile Include="InputLib.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\dist\jquery.slim.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\index.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\JQuery.d.ts" />

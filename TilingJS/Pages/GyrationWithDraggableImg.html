@@ -8,17 +8,24 @@
     <link href="../wwwroot/thirdParty/jquery-ui/jquery-ui.theme.css" rel="stylesheet" />
 
     <style>
-        #img-input {
-            position: absolute;
-            left: 600px;
-            top: 100px;
-            height: 300px;
-        }
-
         h1{
             position: absolute;
             left: 20px;
             top: -10px;
+        }
+
+        #img-input {
+            position: absolute;
+            left: 80px;
+            top: 100px;
+            height: 300px;
+        }
+
+        #img-input-disp {
+            position: absolute;
+            left: 600px;
+            top: 100px;
+            height: 300px;
         }
     </style>
 
@@ -28,15 +35,28 @@
 </head>
 <body>
     <h1>jquery experiments</h1>
-    <img id="img-input" src="../wwwroot/images/CVBilledeDecLysCropped.jpg" />
+    <input id="img-input" type="file" name="img" accept="image/*">
+    <img id="img-input-disp" src="../wwwroot/images/CVBilledeDecLysCropped.jpg" />
+    <!--<img id="img-input-disp" />-->
 </body>
 </html>
 
 <script>
     window.onload = () => {
-        let imgJQ = $("#img-input");
+        let imgInput = document.getElementById("img-input");
+
+        let imgJQ = $("#img-input-disp");
         let img = imgJQ[0];
 
+        imgInput.addEventListener("change", (e) => {
+            let canvas = document.getElementsByTagName("canvas")[0];
+            let ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            img.style.visibility = 'visible';
+        });
+
+
+        TInputLib.bindImgUploadToDisplayImgTag(imgInput, img);
         TSymmetryDemos.gyrationDraggableImgDemo(img);
     };
 </script>

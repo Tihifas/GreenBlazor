@@ -12,19 +12,12 @@
 
         //If applyToRect not set then it applies to entire canvas
         //public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null, drawSymmetryLines = false) {
-        public applyToCtx(ctx: CanvasRenderingContext2D, radius: number = null, drawSymmetryLines = false, drawSrcRegion = false) {
-                let canvasUpperLeft = new TMath.Vector(0, 0);
+        public applyToCtx(ctx: CanvasRenderingContext2D, radius: number = null, drawSymmetryLines = false, drawSrcRegion = false)
+        {
+            let canvasUpperLeft = new TMath.Vector(0, 0);
             if (radius == null) throw new Error("radius == null not implented");
-            //if (applyToRect != null) throw new Error("applyToRect != null not implented");
-            //else {
-            //    let width = ctx.canvas.width;
-            //    let height = ctx.canvas.height;
-            //    applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
-            //}
 
-            let angle1 = TMath.Angle.fromRadiansFromYNeg(-this.angle.radiansFromXPos);
-            let angle2 = TMath.Angle.fromRadiansFromYNeg(0);
-            let cakeSlicePath = TCanvasLib.cakeSlicePath(this.pos, radius, angle1, angle2);
+            let cakeSlicePath = this.cakeSlicePath(radius);
 
             for (var i = 1; i < this.period; i++) {
                 let angleI = new TMath.Angle(this.angle.angle * i);
@@ -35,6 +28,12 @@
 
             if (drawSrcRegion) ctx.stroke(cakeSlicePath);   
             if (drawSymmetryLines) this.drawSymmetryLines(ctx);
+        }
+
+        public cakeSlicePath(radius: number): Path2D {
+            let angle1 = TMath.Angle.fromRadiansFromYNeg(-this.angle.radiansFromXPos);
+            let angle2 = TMath.Angle.fromRadiansFromYNeg(0);
+            return TCanvasLib.cakeSlicePath(this.pos, radius, angle1, angle2);
         }
 
         public drawSymmetryLines(ctx: CanvasRenderingContext2D, lineL: number = null) {

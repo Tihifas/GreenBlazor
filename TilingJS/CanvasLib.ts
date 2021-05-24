@@ -110,6 +110,14 @@
         ctx.restore();
     }
 
+    export function drawImgOnCanvasInRegionAsIs(ctx: CanvasRenderingContext2D, img: HTMLImageElement, outlinePath: Path2D) {
+        ctx.save();
+        ctx.clip(outlinePath);
+        drawImgOnCanvasAsIs(ctx, img);
+        ctx.restore();
+    }
+
+
     export function cakeSlicePath(center: TMath.Vector, radius: number, angle1: TMath.Angle, angle2: TMath.Angle)
         : Path2D {
         let path = new Path2D();

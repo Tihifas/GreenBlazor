@@ -66,20 +66,20 @@
 
         let rotation = new TCanvasClasses.Rotation(TMath.Angle.fromDegreesFromXPos(5), center.copyAddXY(90, -90));
         let gPoint = new TSymmetries.GyrationPoint(center, 6);
+        let gPointRadius = 1000;
 
         imgJQ.draggable({
             drag: function (event, ui) {
                 img.style.visibility = 'hidden';
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                TCanvasLib.drawImgOnCanvasAsIs(ctx, img);
-                gPoint.applyToCtx(ctx, 1000, false, false);
+                let gPointCakeSlice = gPoint.cakeSlicePath(gPointRadius);
+                TCanvasLib.drawImgOnCanvasInRegionAsIs(ctx, img, gPointCakeSlice);
+                gPoint.applyToCtx(ctx, gPointRadius, false, false);
             }
         });
 
-        imgJQ.on("dragstop", (event, ui) => {
-            //img.style.visibility = 'visible';
-        });
-
-        //}
+        //imgJQ.on("dragstop", (event, ui) => {
+        //    img.style.visibility = 'visible';
+        //});
     }
 }

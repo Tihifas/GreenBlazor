@@ -275,6 +275,13 @@ var TCanvasLib;
         ctx.restore();
     }
     TCanvasLib.drawImgOnCanvasAsIs = drawImgOnCanvasAsIs;
+    function drawImgOnCanvasInRegionAsIs(ctx, img, outlinePath) {
+        ctx.save();
+        ctx.clip(outlinePath);
+        drawImgOnCanvasAsIs(ctx, img);
+        ctx.restore();
+    }
+    TCanvasLib.drawImgOnCanvasInRegionAsIs = drawImgOnCanvasInRegionAsIs;
     function cakeSlicePath(center, radius, angle1, angle2) {
         var path = new Path2D();
         path.moveTo(center.x, center.y);
@@ -812,15 +819,7 @@ var TSymmetries;
             var canvasUpperLeft = new TMath.Vector(0, 0);
             if (radius == null)
                 throw new Error("radius == null not implented");
-            //if (applyToRect != null) throw new Error("applyToRect != null not implented");
-            //else {
-            //    let width = ctx.canvas.width;
-            //    let height = ctx.canvas.height;
-            //    applyToRect = new TPosObjects.Rectangle(canvasUpperLeft, width, height);
-            //}
-            var angle1 = TMath.Angle.fromRadiansFromYNeg(-this.angle.radiansFromXPos);
-            var angle2 = TMath.Angle.fromRadiansFromYNeg(0);
-            var cakeSlicePath = TCanvasLib.cakeSlicePath(this.pos, radius, angle1, angle2);
+            var cakeSlicePath = this.cakeSlicePath(radius);
             for (var i = 1; i < this.period; i++) {
                 var angleI = new TMath.Angle(this.angle.angle * i);
                 var rotation = new TCanvasClasses.Rotation(angleI, this.pos);
@@ -830,6 +829,11 @@ var TSymmetries;
                 ctx.stroke(cakeSlicePath);
             if (drawSymmetryLines)
                 this.drawSymmetryLines(ctx);
+        };
+        GyrationPoint.prototype.cakeSlicePath = function (radius) {
+            var angle1 = TMath.Angle.fromRadiansFromYNeg(-this.angle.radiansFromXPos);
+            var angle2 = TMath.Angle.fromRadiansFromYNeg(0);
+            return TCanvasLib.cakeSlicePath(this.pos, radius, angle1, angle2);
         };
         GyrationPoint.prototype.drawSymmetryLines = function (ctx, lineL) {
             if (lineL === void 0) { lineL = null; }
@@ -900,18 +904,19 @@ var TSymmetryDemos;
         TCanvasLib.drawImgOnCanvasAsIs(ctx, img);
         var rotation = new TCanvasClasses.Rotation(TMath.Angle.fromDegreesFromXPos(5), center.copyAddXY(90, -90));
         var gPoint = new TSymmetries.GyrationPoint(center, 6);
+        var gPointRadius = 1000;
         imgJQ.draggable({
             drag: function (event, ui) {
                 img.style.visibility = 'hidden';
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                TCanvasLib.drawImgOnCanvasAsIs(ctx, img);
-                gPoint.applyToCtx(ctx, 1000, false, false);
+                var gPointCakeSlice = gPoint.cakeSlicePath(gPointRadius);
+                TCanvasLib.drawImgOnCanvasInRegionAsIs(ctx, img, gPointCakeSlice);
+                gPoint.applyToCtx(ctx, gPointRadius, false, false);
             }
         });
-        imgJQ.on("dragstop", function (event, ui) {
-            //img.style.visibility = 'visible';
-        });
-        //}
+        //imgJQ.on("dragstop", (event, ui) => {
+        //    img.style.visibility = 'visible';
+        //});
     }
     TSymmetryDemos.gyrationDraggableImgDemo = gyrationDraggableImgDemo;
 })(TSymmetryDemos || (TSymmetryDemos = {}));
@@ -1037,4 +1042,21 @@ var TCanvasTagCreation;
     }
     TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
 })(TCanvasTagCreation || (TCanvasTagCreation = {}));
+var TInputLib;
+(function (TInputLib) {
+    function bindImgUploadToDisplayImgTag(inputElmnt, displayTag) {
+        //if (typeof $ == 'undefined') {
+        //    throw new Error("$ == 'undefined'");
+        //}
+        inputElmnt.addEventListener("change", function (e) {
+            var file = inputElmnt.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                displayTag.src = reader.result.toString();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    TInputLib.bindImgUploadToDisplayImgTag = bindImgUploadToDisplayImgTag;
+})(TInputLib || (TInputLib = {}));
 //# sourceMappingURL=Tiling.js.map
