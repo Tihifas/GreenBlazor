@@ -108,17 +108,6 @@ var TCanvasClasses;
         return Rotation;
     }());
     TCanvasClasses.Rotation = Rotation;
-    //Abandoned because confusing to make line without plotting it
-    //export class Line {
-    //    point: TMath.Vector;
-    //    parallelVector: TMath.Vector;
-    //    angle: TMath.Angle;
-    //    constructor(point: TMath.Vector, angle: TMath.Angle) {
-    //        this.point = point;
-    //        this.angle = angle;
-    //        this.parallelVector = new TMath.Vector(Math.cos(angle.degreesFromXPos), Math.sin(angle.degreesFromXPos));
-    //    }
-    //}
 })(TCanvasClasses || (TCanvasClasses = {}));
 var TDemos;
 (function (TDemos) {
@@ -322,33 +311,51 @@ var TCanvasLib;
         return PathTurtle;
     }());
     TCanvasLib.PathTurtle = PathTurtle;
-    function drawLineByVector(ctx, point, vector, strokeStyle) {
-        if (strokeStyle === void 0) { strokeStyle = null; }
-        if (strokeStyle != null)
-            ctx.strokeStyle = strokeStyle;
-        var destination = TMath.Vector.add(point, vector);
-        ctx.beginPath();
-        ctx.moveTo(point.x, point.y);
-        ctx.lineTo(destination.x, destination.y);
-        ctx.stroke();
-    }
-    TCanvasLib.drawLineByVector = drawLineByVector;
-    function drawLineByAngle(point, angle, ctx, bothDirections, strokeStyle) {
-        if (bothDirections === void 0) { bothDirections = true; }
-        if (strokeStyle === void 0) { strokeStyle = null; }
-        var canvas = ctx.canvas;
-        var canvasW = canvas.width;
-        var canvasH = canvas.height;
-        var lineLength = Math.sqrt(canvasW * canvasW + canvasH * canvasH);
-        var lineVector = TMath.Vector.fromPolar(lineLength, angle);
-        TCanvasLib.drawLineByVector(ctx, point, lineVector, strokeStyle);
-        if (bothDirections) {
-            lineVector.scale(-1);
-            TCanvasLib.drawLineByVector(ctx, point, lineVector, strokeStyle);
-        }
-    }
-    TCanvasLib.drawLineByAngle = drawLineByAngle;
 })(TCanvasLib || (TCanvasLib = {}));
+var TCanvasTagCreation;
+(function (TCanvasTagCreation) {
+    function MakeCanvas(x, y, width, height, drawBorder, parentElmnt, fixCanvasDpi, zIndex) {
+        if (drawBorder === void 0) { drawBorder = false; }
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (zIndex === void 0) { zIndex = -1; }
+        if (parentElmnt == null) {
+            parentElmnt = document.body;
+        }
+        var canvas = document.createElement("canvas");
+        canvas.style.zIndex = zIndex.toString();
+        if (fixCanvasDpi)
+            TCanvasLib.fixCanvasDpi(canvas);
+        canvas.style.position = "absolute";
+        canvas.style.left = x + 'px';
+        canvas.style.top = y + 'px';
+        canvas.width = width; //important to set canvas.width/height, not just canvas.style.width!
+        canvas.height = height;
+        parentElmnt.appendChild(canvas);
+        if (drawBorder)
+            canvas.style.border = "1px solid black";
+        return canvas;
+    }
+    TCanvasTagCreation.MakeCanvas = MakeCanvas;
+    function MakeCanvasColumn(n, heightOfOne, width, x, y, parentElmnt, fixCanvasDpi) {
+        if (width === void 0) { width = null; }
+        if (x === void 0) { x = 0; }
+        if (y === void 0) { y = 0; }
+        if (parentElmnt === void 0) { parentElmnt = null; }
+        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
+        if (width === null)
+            throw new Error("notimplemented"); //TODO screen/parent width
+        var yCurrent = y;
+        var canvases = new Array(n);
+        for (var i = 0; i < n; i++) {
+            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, false, parentElmnt, fixCanvasDpi);
+            yCurrent += heightOfOne;
+            canvases[i] = canvas;
+        }
+        return canvases;
+    }
+    TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
+})(TCanvasTagCreation || (TCanvasTagCreation = {}));
 //Draw in constructor instead?
 var SimpleDrawable = /** @class */ (function () {
     function SimpleDrawable(ctx) {
@@ -623,6 +630,23 @@ function imageGalleryDemo() {
     //        ctx.drawImage(img, 0, 0);
     //    }
 }
+var TInputLib;
+(function (TInputLib) {
+    function bindImgUploadToDisplayImgTag(inputElmnt, displayTag) {
+        //if (typeof $ == 'undefined') {
+        //    throw new Error("$ == 'undefined'");
+        //}
+        inputElmnt.addEventListener("change", function (e) {
+            var file = inputElmnt.files[0];
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                displayTag.src = reader.result.toString();
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    TInputLib.bindImgUploadToDisplayImgTag = bindImgUploadToDisplayImgTag;
+})(TInputLib || (TInputLib = {}));
 var TPlotterDemos;
 (function (TPlotterDemos) {
     function mouseDemo() {
@@ -998,65 +1022,55 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TCanvasTagCreation;
-(function (TCanvasTagCreation) {
-    function MakeCanvas(x, y, width, height, drawBorder, parentElmnt, fixCanvasDpi, zIndex) {
-        if (drawBorder === void 0) { drawBorder = false; }
-        if (parentElmnt === void 0) { parentElmnt = null; }
-        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
-        if (zIndex === void 0) { zIndex = -1; }
-        if (parentElmnt == null) {
-            parentElmnt = document.body;
+var TSymmetries;
+(function (TSymmetries) {
+    var Mirror = /** @class */ (function () {
+        function Mirror() {
         }
-        var canvas = document.createElement("canvas");
-        canvas.style.zIndex = zIndex.toString();
-        if (fixCanvasDpi)
-            TCanvasLib.fixCanvasDpi(canvas);
-        canvas.style.position = "absolute";
-        canvas.style.left = x + 'px';
-        canvas.style.top = y + 'px';
-        canvas.width = width; //important to set canvas.width/height, not just canvas.style.width!
-        canvas.height = height;
-        parentElmnt.appendChild(canvas);
-        if (drawBorder)
-            canvas.style.border = "1px solid black";
-        return canvas;
-    }
-    TCanvasTagCreation.MakeCanvas = MakeCanvas;
-    function MakeCanvasColumn(n, heightOfOne, width, x, y, parentElmnt, fixCanvasDpi) {
-        if (width === void 0) { width = null; }
-        if (x === void 0) { x = 0; }
-        if (y === void 0) { y = 0; }
-        if (parentElmnt === void 0) { parentElmnt = null; }
-        if (fixCanvasDpi === void 0) { fixCanvasDpi = true; }
-        if (width === null)
-            throw new Error("notimplemented"); //TODO screen/parent width
-        var yCurrent = y;
-        var canvases = new Array(n);
-        for (var i = 0; i < n; i++) {
-            var canvas = MakeCanvas(x, yCurrent, width, heightOfOne, false, parentElmnt, fixCanvasDpi);
-            yCurrent += heightOfOne;
-            canvases[i] = canvas;
+        return Mirror;
+    }());
+    TSymmetries.Mirror = Mirror;
+})(TSymmetries || (TSymmetries = {}));
+var TMath;
+(function (TMath) {
+    var Line = /** @class */ (function () {
+        function Line(point, angle) {
+            this.point = point;
+            this.angle = angle;
+            this.parallelVector = new TMath.Vector(Math.cos(angle.degreesFromXPos), Math.sin(angle.degreesFromXPos));
         }
-        return canvases;
-    }
-    TCanvasTagCreation.MakeCanvasColumn = MakeCanvasColumn;
-})(TCanvasTagCreation || (TCanvasTagCreation = {}));
-var TInputLib;
-(function (TInputLib) {
-    function bindImgUploadToDisplayImgTag(inputElmnt, displayTag) {
-        //if (typeof $ == 'undefined') {
-        //    throw new Error("$ == 'undefined'");
-        //}
-        inputElmnt.addEventListener("change", function (e) {
-            var file = inputElmnt.files[0];
-            var reader = new FileReader();
-            reader.onloadend = function () {
-                displayTag.src = reader.result.toString();
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-    TInputLib.bindImgUploadToDisplayImgTag = bindImgUploadToDisplayImgTag;
-})(TInputLib || (TInputLib = {}));
+        return Line;
+    }());
+    TMath.Line = Line;
+})(TMath || (TMath = {}));
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var TCanvasClasses;
+(function (TCanvasClasses) {
+    var CanvasLine = /** @class */ (function (_super) {
+        __extends(CanvasLine, _super);
+        function CanvasLine(point, angle, draw) {
+            if (draw === void 0) { draw = true; }
+            var _this = _super.call(this, point, angle) || this;
+            if (draw)
+                _this.draw();
+            return _this;
+        }
+        CanvasLine.prototype.draw = function () {
+        };
+        return CanvasLine;
+    }(TMath.Line));
+    TCanvasClasses.CanvasLine = CanvasLine;
+})(TCanvasClasses || (TCanvasClasses = {}));
 //# sourceMappingURL=Tiling.js.map
