@@ -258,6 +258,7 @@
     <TypeScriptCompile Include="Canvas\CanvasPlanarObjects.ts" />
     <TypeScriptCompile Include="InputLib.ts" />
     <TypeScriptCompile Include="Math\PlanarObjects.ts" />
+    <TypeScriptCompile Include="Redraw.ts" />
     <TypeScriptCompile Include="Symmetry\Mirror.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\dist\jquery.slim.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\index.d.ts" />

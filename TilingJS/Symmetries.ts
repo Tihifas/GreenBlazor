@@ -41,7 +41,7 @@
                 let rotationAngle = new TMath.Angle(-Math.PI/2)
                                         .add(this.angle.copy().scale(i));
 
-                TCanvasLib.drawLineByAngle(this.pos, rotationAngle, ctx);
+                TCanvasClasses.CanvasLine.drawLineByAngle(this.pos, rotationAngle, ctx);
                 if (lineL != null) throw new Error("not implemented");
             }
         }

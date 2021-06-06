@@ -1,5 +1,5 @@
-﻿namespace TCanvasClasses {
-    export class CanvasLine extends TMath.Line {
+﻿namespace TMath {
+    export class CanvasLine extends Line {
         constructor(point: TMath.Vector, angle: TMath.Angle, draw: boolean = true) {
             super(point, angle);
             if (draw) this.draw();

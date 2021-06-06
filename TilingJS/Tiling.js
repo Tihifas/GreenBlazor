@@ -92,6 +92,60 @@ var TMath;
     }());
     TMath.Angle = Angle;
 })(TMath || (TMath = {}));
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var TCanvasClasses;
+(function (TCanvasClasses) {
+    var CanvasLine = /** @class */ (function (_super) {
+        __extends(CanvasLine, _super);
+        function CanvasLine(point, angle, draw) {
+            if (draw === void 0) { draw = true; }
+            var _this = _super.call(this, point, angle) || this;
+            if (draw)
+                _this.draw();
+            return _this;
+        }
+        CanvasLine.prototype.draw = function () {
+        };
+        CanvasLine.drawLineByVector = function (ctx, point, vector, strokeStyle) {
+            if (strokeStyle === void 0) { strokeStyle = null; }
+            if (strokeStyle != null)
+                ctx.strokeStyle = strokeStyle;
+            var destination = TMath.Vector.add(point, vector);
+            ctx.beginPath();
+            ctx.moveTo(point.x, point.y);
+            ctx.lineTo(destination.x, destination.y);
+            ctx.stroke();
+        };
+        CanvasLine.drawLineByAngle = function (point, angle, ctx, bothDirections, strokeStyle) {
+            if (bothDirections === void 0) { bothDirections = true; }
+            if (strokeStyle === void 0) { strokeStyle = null; }
+            var canvas = ctx.canvas;
+            var canvasW = canvas.width;
+            var canvasH = canvas.height;
+            var lineLength = Math.sqrt(canvasW * canvasW + canvasH * canvasH);
+            var lineVector = TMath.Vector.fromPolar(lineLength, angle);
+            CanvasLine.drawLineByVector(ctx, point, lineVector, strokeStyle);
+            if (bothDirections) {
+                lineVector.scale(-1);
+                CanvasLine.drawLineByVector(ctx, point, lineVector, strokeStyle);
+            }
+        };
+        return CanvasLine;
+    }(TMath.Line));
+    TCanvasClasses.CanvasLine = CanvasLine;
+})(TCanvasClasses || (TCanvasClasses = {}));
 var TCanvasClasses;
 (function (TCanvasClasses) {
     var Rotation = /** @class */ (function () {
@@ -647,6 +701,18 @@ var TInputLib;
     }
     TInputLib.bindImgUploadToDisplayImgTag = bindImgUploadToDisplayImgTag;
 })(TInputLib || (TInputLib = {}));
+var TMath;
+(function (TMath) {
+    var Line = /** @class */ (function () {
+        function Line(point, angle) {
+            this.point = point;
+            this.angle = angle;
+            this.parallelVector = new TMath.Vector(Math.cos(angle.degreesFromXPos), Math.sin(angle.degreesFromXPos));
+        }
+        return Line;
+    }());
+    TMath.Line = Line;
+})(TMath || (TMath = {}));
 var TPlotterDemos;
 (function (TPlotterDemos) {
     function mouseDemo() {
@@ -864,7 +930,7 @@ var TSymmetries;
             for (var i = 0; i < this.period; i++) {
                 var rotationAngle = new TMath.Angle(-Math.PI / 2)
                     .add(this.angle.copy().scale(i));
-                TCanvasLib.drawLineByAngle(this.pos, rotationAngle, ctx);
+                TCanvasClasses.CanvasLine.drawLineByAngle(this.pos, rotationAngle, ctx);
                 if (lineL != null)
                     throw new Error("not implemented");
             }
@@ -872,6 +938,15 @@ var TSymmetries;
         return GyrationPoint;
     }());
     TSymmetries.GyrationPoint = GyrationPoint;
+})(TSymmetries || (TSymmetries = {}));
+var TSymmetries;
+(function (TSymmetries) {
+    var Mirror = /** @class */ (function () {
+        function Mirror() {
+        }
+        return Mirror;
+    }());
+    TSymmetries.Mirror = Mirror;
 })(TSymmetries || (TSymmetries = {}));
 var TSymmetryDemos;
 (function (TSymmetryDemos) {
@@ -1022,55 +1097,40 @@ var TMath;
     }());
     TMath.Vector = Vector;
 })(TMath || (TMath = {}));
-var TSymmetries;
-(function (TSymmetries) {
-    var Mirror = /** @class */ (function () {
-        function Mirror() {
+var TCanvasLib;
+(function (TCanvasLib) {
+    var CANVASOBJECTWRAPPER = /** @class */ (function () {
+        function CANVASOBJECTWRAPPER() {
         }
-        return Mirror;
+        Object.defineProperty(CANVASOBJECTWRAPPER.prototype, "canvas", {
+            get: function () { return this.canvasManager.canvas; },
+            enumerable: false,
+            configurable: true
+        });
+        Object.defineProperty(CANVASOBJECTWRAPPER.prototype, "ctx", {
+            get: function () { return this.canvas.getContext('2D'); },
+            enumerable: false,
+            configurable: true
+        });
+        return CANVASOBJECTWRAPPER;
     }());
-    TSymmetries.Mirror = Mirror;
-})(TSymmetries || (TSymmetries = {}));
-var TMath;
-(function (TMath) {
-    var Line = /** @class */ (function () {
-        function Line(point, angle) {
-            this.point = point;
-            this.angle = angle;
-            this.parallelVector = new TMath.Vector(Math.cos(angle.degreesFromXPos), Math.sin(angle.degreesFromXPos));
+    TCanvasLib.CANVASOBJECTWRAPPER = CANVASOBJECTWRAPPER;
+    //THis way is only good for updating everything. Can certain object be updated one at a time?
+    var CanvasManager = /** @class */ (function () {
+        function CanvasManager(canvas) {
         }
-        return Line;
+        Object.defineProperty(CanvasManager.prototype, "ctx", {
+            get: function () { return this.canvas.getContext('2D'); },
+            enumerable: false,
+            configurable: true
+        });
+        return CanvasManager;
     }());
-    TMath.Line = Line;
-})(TMath || (TMath = {}));
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var TCanvasClasses;
-(function (TCanvasClasses) {
-    var CanvasLine = /** @class */ (function (_super) {
-        __extends(CanvasLine, _super);
-        function CanvasLine(point, angle, draw) {
-            if (draw === void 0) { draw = true; }
-            var _this = _super.call(this, point, angle) || this;
-            if (draw)
-                _this.draw();
-            return _this;
-        }
-        CanvasLine.prototype.draw = function () {
-        };
-        return CanvasLine;
-    }(TMath.Line));
-    TCanvasClasses.CanvasLine = CanvasLine;
-})(TCanvasClasses || (TCanvasClasses = {}));
+    TCanvasLib.CanvasManager = CanvasManager;
+    //function Update{
+    //for each in CANVASOBJECTWRAPPER
+    //draw
+    //}
+    //}
+})(TCanvasLib || (TCanvasLib = {}));
 //# sourceMappingURL=Tiling.js.map
