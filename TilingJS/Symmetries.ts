@@ -1,5 +1,5 @@
 ﻿namespace TSymmetries {
-    export class GyrationPoint {
+    export class GyrationPoint implements TCanvasLib.CanvasOperation {
         pos: TMath.Vector;
         period: number;
         angle: TMath.Angle;
@@ -12,10 +12,12 @@
 
         //If applyToRect not set then it applies to entire canvas
         //public applyToCtx(ctx: CanvasRenderingContext2D, applyToRect: TPosObjects.Rectangle = null, drawSymmetryLines = false) {
-        public applyToCtx(ctx: CanvasRenderingContext2D, radius: number = null, drawSymmetryLines = false, drawSrcRegion = false)
+        public applyToCanvas(canvas: HTMLCanvasElement, radius: number = null, drawSymmetryLines = false, drawSrcRegion = false)
         {
+            let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
             let canvasUpperLeft = new TMath.Vector(0, 0);
-            if (radius == null) throw new Error("radius == null not implented");
+            if (radius == null) radius = canvas.width * 5; //TODO: keep this impl?
 
             let cakeSlicePath = this.cakeSlicePath(radius);
 
@@ -26,7 +28,10 @@
                 TDuplication.copyRotatePasteRegion(ctx, cakeSlicePath, rotation);
             }
 
-            if (drawSrcRegion) ctx.stroke(cakeSlicePath);   
+
+
+            //if (drawSrcRegion) ctx.stroke(cakeSlicePath);    //UNDO
+            if (true) ctx.stroke(cakeSlicePath);   
             if (drawSymmetryLines) this.drawSymmetryLines(ctx);
         }
 
@@ -41,7 +46,7 @@
                 let rotationAngle = new TMath.Angle(-Math.PI/2)
                                         .add(this.angle.copy().scale(i));
 
-                TCanvasClasses.CanvasLine.drawLineByAngle(this.pos, rotationAngle, ctx);
+                TPlane.CanvasLine.drawLineByAngle(this.pos, rotationAngle, ctx);
                 if (lineL != null) throw new Error("not implemented");
             }
         }

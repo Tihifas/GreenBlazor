@@ -43,7 +43,7 @@
                 //ctx.drawImage(img, center.x, center.y - 180);
 
                 let gPoint = new TSymmetries.GyrationPoint(center, iCanvas + 3);
-                gPoint.applyToCtx(ctx, 260, false, false);
+                gPoint.applyToCanvas(canvas, 260, false, false);
             }
         }
     }
@@ -74,7 +74,7 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 let gPointCakeSlice = gPoint.cakeSlicePath(gPointRadius);
                 TCanvasLib.drawImgOnCanvasInRegionAsIs(ctx, img, gPointCakeSlice);
-                gPoint.applyToCtx(ctx, gPointRadius, false, false);
+                gPoint.applyToCanvas(canvas, gPointRadius, false, false);
             }
         });
 

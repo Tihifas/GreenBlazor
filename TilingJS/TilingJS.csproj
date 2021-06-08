@@ -83,6 +83,7 @@
     <Content Include="node_modules\jquery\external\sizzle\dist\sizzle.min.map" />
     <Content Include="node_modules\jquery\package.json" />
     <Content Include="node_modules\jquery\README.md" />
+    <Content Include="Pages\CanvasManagerDemo.html" />
     <Content Include="Pages\GyrationWithDraggableImg.html" />
     <Content Include="wwwroot\thirdParty\jquery-ui\AUTHORS.txt" />
     <Content Include="wwwroot\thirdParty\jquery-ui\external\jquery\jquery.js" />
@@ -255,10 +256,10 @@
     <TypeScriptCompile Include="Angle.ts" />
     <TypeScriptCompile Include="CanvasClasses.ts" />
     <TypeScriptCompile Include="CanvasCopyPasteDemos.ts" />
-    <TypeScriptCompile Include="Canvas\CanvasPlanarObjects.ts" />
+    <TypeScriptCompile Include="CanvasManagerDemo.ts" />
     <TypeScriptCompile Include="InputLib.ts" />
     <TypeScriptCompile Include="Math\PlanarObjects.ts" />
-    <TypeScriptCompile Include="Redraw.ts" />
+    <TypeScriptCompile Include="CanvasManager.ts" />
     <TypeScriptCompile Include="Symmetry\Mirror.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\dist\jquery.slim.d.ts" />
     <TypeScriptCompile Include="node_modules\%40types\jquery\index.d.ts" />
@@ -287,6 +288,7 @@
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Canvas\" />
     <Folder Include="node_modules\.bin\" />
     <Folder Include="Properties\" />
   </ItemGroup>
